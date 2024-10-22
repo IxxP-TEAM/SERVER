@@ -52,8 +52,8 @@ jobs:
         uses: einaregilsson/beanstalk-deploy@v20
         with:
           aws_access_key: ${{ secrets.AWS_ACTION_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_ACTION_SECRET_ACCESS_KEY }}
-          application_name: IP-dev
+          aws_secret_key: ${{ secrets.AWS_ACTION_SECRET_KEY_ID }}
+          application_name: ip-dev
           environment_name: Ip-dev-env
           version_label: github-action-${{ steps.current-time.outputs.formattedTime }}
           region: ap-northeast-2
