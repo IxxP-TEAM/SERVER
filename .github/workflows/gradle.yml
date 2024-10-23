@@ -23,7 +23,7 @@ jobs:
       - name: Clear Gradle Cache
         run: ./gradlew clean --refresh-dependencies
 
-        # gradlew에 실행 권한 부여
+      # gradlew에 실행 권한 부여
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
@@ -59,9 +59,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Set up JDK 17 for deploy 단계
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
       # gradlew에 실행 권한 부여
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
+
+      # 환경 변수로 JAVA_HOME 설정
+      - name: Set JAVA_HOME for Java 17
+        run: echo "JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))" >> $GITHUB_ENV
 
       # Spring Boot 어플리케이션 Build (1)
       - name: Spring Boot Build
