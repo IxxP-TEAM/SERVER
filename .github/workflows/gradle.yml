@@ -20,7 +20,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # gradlew에 실행 권한 부여
+      - name: Clear Gradle Cache
+        run: ./gradlew clean --refresh-dependencies
+
+        # gradlew에 실행 권한 부여
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
