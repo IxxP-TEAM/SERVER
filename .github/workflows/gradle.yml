@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Set up JDK 17
+      # Set up JDK 177
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
