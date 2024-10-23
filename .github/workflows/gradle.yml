@@ -105,7 +105,7 @@ jobs:
           script: |
             sudo docker stop ixxp
             sudo docker rm ixxp
-            sudo docker run -it -d -p 8081:8080 --name devops-test zoown12/ixxp
+            sudo docker run -it -d -p 8081:8080 --name ixxp zoown12/ixxp
 
       # REMOVE Github IP FROM security group (9)
       - name: Remove IP FROM security group
