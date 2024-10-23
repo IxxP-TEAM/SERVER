@@ -103,6 +103,7 @@ jobs:
           port: 22
           timeout: 60s
           script: |
+            sudo docker pull zoown12/ixxp
             sudo docker stop ixxp
             sudo docker rm ixxp
             sudo docker run -it -d -p 8081:8080 --name ixxp zoown12/ixxp
