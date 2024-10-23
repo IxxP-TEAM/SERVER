@@ -2,7 +2,7 @@ name: Java CI with Gradle
 
 on:
   pull_request:
-    branches: [ "Develop" ]  # 특정 브랜치로 PR 생성 시 실행
+    branches: [ "Develop" ]  # 특정 브랜치로 PR 생성 시 실행1
 
 jobs:
   build:
