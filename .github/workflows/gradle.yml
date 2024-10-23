@@ -103,8 +103,8 @@ jobs:
           port: 22
           timeout: 60s
           script: |
-            sudo docker stop devops-test
-            sudo docker rm devops-test
+            sudo docker stop ixxp
+            sudo docker rm ixxp
             sudo docker run -it -d -p 8081:8080 --name devops-test zoown12/ixxp
 
       # REMOVE Github IP FROM security group (9)

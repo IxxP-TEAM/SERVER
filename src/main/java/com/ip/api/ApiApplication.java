@@ -8,7 +8,7 @@ public class ApiApplication {
 
 	public static void main(String[] args) {
 		System.out.print("Server Start...");
-		
+
 		SpringApplication.run(ApiApplication.class, args);
 	}
 
