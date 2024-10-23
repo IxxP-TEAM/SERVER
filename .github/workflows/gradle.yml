@@ -93,7 +93,7 @@ jobs:
         run: |
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
-      # AWS EC2 Server Connect & Docker 명령어 실행 ()
+      # AWS EC2 Server Connect & Docker 명령어 실행 (8)
       - name: AWS EC2 Connection
         uses: appleboy/ssh-action@v0.1.6
         with:
