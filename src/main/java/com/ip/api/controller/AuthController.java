@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/admin")
 @RequiredArgsConstructor
-public class UserController {
+public class AuthController {
+
     private final UserService userService;
 
-    //회원가입
+    //회원가입(직원 등록)
     @PostMapping("/join")
     public ApiResponse<String> join(@RequestBody UserJoinDTO request) {
         userService.join(request);
