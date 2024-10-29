@@ -12,7 +12,8 @@ public enum ErrorCode {
 
     //user
     USER_EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "USER-001", "이미 존재하는 이메일입니다."),
-    USER_EMAIL_SEND_FAIL(HttpStatus.BAD_REQUEST, "USER-002", "이메일 발송에 실패하였습니다.")
+    USER_EMAIL_SEND_FAIL(HttpStatus.BAD_REQUEST, "USER-002", "이메일 발송에 실패하였습니다."),
+    USER_PASSWORD_INVALID(HttpStatus.BAD_REQUEST, "USER-005", "비밀번호 형식이 맞지 않습니다."),
     ;
 
     private final String message;
