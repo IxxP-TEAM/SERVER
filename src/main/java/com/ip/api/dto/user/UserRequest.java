@@ -65,4 +65,12 @@ public class UserRequest {
             return cnt >= 2;
         }
     }
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LoginDTO {
+        private String connId;
+        private String password;
+    }
 }
