@@ -3,6 +3,7 @@ package com.ip.api.dto.user;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,5 +38,39 @@ public class UserRequest {
         private String city;
         private String state;
         private int zipCode;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PasswordDTO {
+        @Size(max = 8, message = "비밀번호는 8자 이상이어야 합니다.")
+        @JsonProperty("newPassword")
+        private String newPassword;
+
+        public boolean isValidPassword() {
+            int cnt = 0;
+
+            if (this.newPassword.matches(".*[A-Za-z].*")) {
+                cnt++;
+            }
+            if (this.newPassword.matches(".*\\d.*")) {
+                cnt ++;
+            }
+            if (this.newPassword.matches(".*\\W.*")) {
+                cnt++;
+            }
+
+            return cnt >= 2;
+        }
+    }
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LoginDTO {
+        private String connId;
+        private String password;
     }
 }

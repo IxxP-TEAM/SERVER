@@ -2,16 +2,31 @@ package com.ip.api.service;
 
 import com.ip.api.apiPayload.code.ErrorCode;
 import com.ip.api.apiPayload.exception.BadRequestException;
+import com.ip.api.config.security.CustomUserDetails;
+import com.ip.api.config.security.JwtTokenDto;
+import com.ip.api.config.security.JwtUtil;
 import com.ip.api.domain.Address;
 import com.ip.api.domain.User;
 import com.ip.api.domain.enums.Department;
 import com.ip.api.domain.enums.Role;
 import com.ip.api.domain.enums.UserStatus;
+import com.ip.api.dto.user.UserRequest.LoginDTO;
+import com.ip.api.dto.user.UserRequest.PasswordDTO;
 import com.ip.api.dto.user.UserRequest.UserJoinDTO;
+import com.ip.api.dto.user.UserResponse.PasswordResult;
 import com.ip.api.repository.AddressRepository;
 import com.ip.api.repository.UserRepository;
 import jakarta.mail.MessagingException;
+import java.util.Collection;
+import java.util.Iterator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,52 +34,58 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
     private final EmailService emailService;
 
-    public void join(UserJoinDTO request) {
-
-        // 이메일 발송
-        String connId = generatedId(request.getEmail());
-        try {
-            emailService.sendEmail(connId, request.getEmail(), request.getName());
-        } catch (MessagingException e) {
-            throw new BadRequestException(ErrorCode.USER_EMAIL_SEND_FAIL);
+    public PasswordResult changePassword(User user, PasswordDTO request) {
+        if (!request.isValidPassword()) {
+            throw new BadRequestException(ErrorCode.USER_PASSWORD_INVALID);
         }
-
-        Address address = Address.builder()
-                .street(request.getAddress().getStreet())
-                .city(request.getAddress().getCity())
-                .state(request.getAddress().getState())
-                .zipCode(request.getAddress().getZipCode())
+        // 새로운 User 객체 생성
+        User updatedUser = User.builder()
+                .userId(user.getUserId())
+                .connId(user.getConnId())
+                .email(user.getEmail())
+                .userName(user.getUserName())
+                .birth(user.getBirth())
+                .userPhone(user.getUserPhone())
+                .hireDate(user.getHireDate())
+                .jobTitle(user.getJobTitle())
+                .department(user.getDepartment())
+                .address(user.getAddress())
+                .role(user.getRole())
+                .password(passwordEncoder.encode(request.getNewPassword()))
+                .userStatus(user.getUserStatus())
                 .build();
 
-        Address savedAddress = addressRepository.save(address);
+        // 새 User 객체 저장
+        userRepository.save(updatedUser);
 
-        User user = User.builder()
-                .email(request.getEmail())
-                .userName(request.getName())
-                .connId(connId)
-                .address(savedAddress)
-                .birth(request.getBirth())
-                .userPhone(request.getUserPhone())
-                .hireDate(request.getHireDate())
-                .jobTitle(request.getJobTitle())
-                .department(Department.valueOf(request.getDepartment()))
-                .password("0000")
-                .role(Role.ROLE_USER)
-                .userStatus(UserStatus.valueOf(request.getUserStatus()))
+        return PasswordResult.builder()
+                .userId(updatedUser.getUserId())
                 .build();
-
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new BadRequestException(ErrorCode.USER_EMAIL_ALREADY_EXISTS);
-        }
-        userRepository.save(user);
     }
 
-    //아이디 생성
-    private String generatedId(String email) {
-        int idx = email.indexOf("@");
-        String connId = email.substring(0, idx);
-        return connId;
+    public JwtTokenDto login(LoginDTO request) {
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(request.getConnId(), request.getPassword());
+        try {
+            Authentication auth = authenticationManager.authenticate(authToken);  //인증 실패 시 예외처리
+
+            CustomUserDetails customUserDetails = (CustomUserDetails) auth.getPrincipal();
+            String username = customUserDetails.getUsername();
+
+            Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+            Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
+            GrantedAuthority authority = iterator.next();
+            String role = authority.getAuthority();
+
+            return jwtUtil.generateToken(username, role);
+        } catch (BadCredentialsException e) {
+            throw new BadRequestException(ErrorCode.USER_BAD_CREDENTIAL);  // 잘못된 자격 증명
+        } catch (AuthenticationException e) {
+            throw new BadRequestException(ErrorCode.USER_AUTHENTICATION_FAIL);  // 기타 인증 오류
+        }
     }
 }
