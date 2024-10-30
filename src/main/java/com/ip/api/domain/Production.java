@@ -1,6 +1,9 @@
 package com.ip.api.domain;
 
 import com.ip.api.domain.common.BaseEntity;
+import com.ip.api.domain.enums.ProductionStatus;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,15 +21,22 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Outbound extends BaseEntity {
+public class Production extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long outboundId;
-    private int outboundQuantity;
-    private LocalDate outboundDate;
+    private Long productionId;
+    @Column(nullable = false)
+    private LocalDate startDate;
+    @Column(nullable = false)
+    private LocalDate endDate;
+    @Column(nullable = false)
+    private int targetQuantity;
+    private int resultQuantity;
+    @Column(nullable = false)
+    private ProductionStatus productionStatus;
     @ManyToOne
-    @JoinColumn(name = "inventory_id", referencedColumnName = "inventoryId")
-    private Inventory inventory;
+    @JoinColumn(name = "product_id", referencedColumnName = "productId")
+    private Product product;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "userId")
     private User user;
