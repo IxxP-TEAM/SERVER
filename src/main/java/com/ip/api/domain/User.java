@@ -11,8 +11,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,12 +34,11 @@ public class User extends BaseEntity {
     private String userPhone;
     private LocalDate hireDate;
     private String jobTitle;
+    @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
+    @Enumerated(EnumType.STRING)
     private Department department;
-    @OneToOne
-    @JoinColumn(name = "address_id", referencedColumnName = "addressId")
-    private Address address;
-
+    private String address;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;

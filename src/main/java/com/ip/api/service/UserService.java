@@ -5,18 +5,11 @@ import com.ip.api.apiPayload.exception.BadRequestException;
 import com.ip.api.config.security.CustomUserDetails;
 import com.ip.api.config.security.JwtTokenDto;
 import com.ip.api.config.security.JwtUtil;
-import com.ip.api.domain.Address;
 import com.ip.api.domain.User;
-import com.ip.api.domain.enums.Department;
-import com.ip.api.domain.enums.Role;
-import com.ip.api.domain.enums.UserStatus;
 import com.ip.api.dto.user.UserRequest.LoginDTO;
 import com.ip.api.dto.user.UserRequest.PasswordDTO;
-import com.ip.api.dto.user.UserRequest.UserJoinDTO;
 import com.ip.api.dto.user.UserResponse.PasswordResult;
-import com.ip.api.repository.AddressRepository;
 import com.ip.api.repository.UserRepository;
-import jakarta.mail.MessagingException;
 import java.util.Collection;
 import java.util.Iterator;
 import lombok.RequiredArgsConstructor;
@@ -33,11 +26,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final AddressRepository addressRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-    private final EmailService emailService;
 
     public PasswordResult changePassword(User user, PasswordDTO request) {
         if (!request.isValidPassword()) {

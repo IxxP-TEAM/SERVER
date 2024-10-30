@@ -2,18 +2,14 @@ package com.ip.api.service;
 
 import com.ip.api.apiPayload.code.ErrorCode;
 import com.ip.api.apiPayload.exception.BadRequestException;
-import com.ip.api.config.security.JwtUtil;
-import com.ip.api.domain.Address;
 import com.ip.api.domain.User;
 import com.ip.api.domain.enums.Department;
 import com.ip.api.domain.enums.Role;
 import com.ip.api.domain.enums.UserStatus;
 import com.ip.api.dto.user.UserRequest.UserJoinDTO;
-import com.ip.api.repository.AddressRepository;
 import com.ip.api.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +17,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
-    private final AddressRepository addressRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
     public void join(UserJoinDTO request) {
@@ -34,20 +29,11 @@ public class AuthService {
             throw new BadRequestException(ErrorCode.USER_EMAIL_SEND_FAIL);
         }
 
-        Address address = Address.builder()
-                .street(request.getAddress().getStreet())
-                .city(request.getAddress().getCity())
-                .state(request.getAddress().getState())
-                .zipCode(request.getAddress().getZipCode())
-                .build();
-
-        Address savedAddress = addressRepository.save(address);
-
         User user = User.builder()
                 .email(request.getEmail())
                 .userName(request.getName())
                 .connId(connId)
-                .address(savedAddress)
+                .address(request.getAddress())
                 .birth(request.getBirth())
                 .userPhone(request.getUserPhone())
                 .hireDate(request.getHireDate())
