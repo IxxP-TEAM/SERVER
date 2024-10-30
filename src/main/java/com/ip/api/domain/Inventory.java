@@ -1,6 +1,8 @@
 package com.ip.api.domain;
 
 import com.ip.api.domain.common.BaseEntity;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,10 +24,10 @@ public class Inventory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long inventoryId;
-    private int inventoryQuantity;
-    private int thresholdQuantity;
+    @Column(nullable = false)
+    private int currentQuantity;
+    @Column(nullable = false)
     private LocalDate expirationDate;
-    private String reason;
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "productId")
     private Product product;

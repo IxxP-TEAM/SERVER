@@ -1,6 +1,8 @@
 package com.ip.api.domain;
 
 import com.ip.api.domain.common.BaseEntity;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,14 +19,18 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InventoryList extends BaseEntity {
+public class ProductionAnalysis extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long inventoryListId;
+    private Long analysisId;
+    @Column(columnDefinition = "TEXT")
+    private String issueCause;
+    @Column(columnDefinition = "TEXT")
+    private String improvements;
     @ManyToOne
-    @JoinColumn(name = "plan_id", referencedColumnName = "planId")
-    private ProductionPlan productionPlan;
+    @JoinColumn(name = "production_id", referencedColumnName = "productionId")
+    private Production production;
     @ManyToOne
-    @JoinColumn(name = "inventory_id", referencedColumnName = "inventoryId")
-    private Inventory inventory;
+    @JoinColumn(name = "user_id", referencedColumnName = "userId")
+    private User user;
 }
