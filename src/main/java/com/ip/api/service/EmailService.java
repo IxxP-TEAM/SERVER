@@ -18,7 +18,8 @@ public class EmailService {
     public void sendEmail(String connId, String userEmail, String username) throws MessagingException {
         String subject = "IxxP 사원 아이디 안내 메일입니다.";
         String body = "<p>안녕하세요. " + username + "님,</p>"
-                + "<p>아이디: " + connId + " 입니다. </p>";
+                + "<p>아이디: " + connId + " 입니다. </p>"
+                + "<p>초기 비밀번호는 0000 입니다. 로그인 후 마이페이지에서 비밀번호 재설정을 진행해주세요. </p>";
 
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);

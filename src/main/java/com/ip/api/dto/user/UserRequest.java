@@ -21,23 +21,13 @@ public class UserRequest {
         private String email;
         @NotBlank(message = "이름은 필수 입력 값입니다.")
         private String name;
-        private AddressDTO address;
+        private String address;
         private String birth;
         private String userPhone;
         private LocalDate hireDate;
         private String jobTitle;
         private String department;
         private String userStatus;
-    }
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class AddressDTO {
-        private String street;
-        private String city;
-        private String state;
-        private int zipCode;
     }
 
     @Getter
