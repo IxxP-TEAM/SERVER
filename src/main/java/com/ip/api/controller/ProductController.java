@@ -35,4 +35,5 @@ public class ProductController {
         List<ProductResponseDto> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
+    
 }
