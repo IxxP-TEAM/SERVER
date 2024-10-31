@@ -20,4 +20,5 @@ public class CustomerResponse {
     private String registrationNumber;
     private String customerNote;
     private String userName; // User의 이름만 포함
+    private Long userId;
 }
