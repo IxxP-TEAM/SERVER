@@ -5,6 +5,7 @@ import com.ip.api.auth.AuthUser;
 import com.ip.api.domain.Customer;
 import com.ip.api.domain.User;
 import com.ip.api.dto.customer.CustomerRequest.CustomerDTO;
+import com.ip.api.dto.customer.CustomerResponse;
 import com.ip.api.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +19,8 @@ public class CustomerController {
 
     // 고객사 등록
     @PostMapping("/create")
-    public ApiResponse<Customer> createCustomer(@AuthUser User user, @RequestBody CustomerDTO request) {
-        Customer response = customerService.createCustomer(user, request);
+    public ApiResponse<CustomerResponse> createCustomer(@AuthUser User user, @RequestBody CustomerDTO request) {
+        CustomerResponse response = customerService.createCustomer(user, request);
         return ApiResponse.of(response);
     }
 }
