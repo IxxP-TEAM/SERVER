@@ -8,6 +8,10 @@ import com.ip.api.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class CustomerService {
 
@@ -46,7 +50,49 @@ public class CustomerService {
                 savedCustomer.getCustomerPersonEmail(),
                 savedCustomer.getRegistrationNumber(),
                 savedCustomer.getCustomerNote(),
-                user.getUserName() // User의 이름만 포함
+                user.getUserName(),
+                user.getUserId()// User의 이름만 포함
         );
     }
+
+    // 모든 고객 정보 리스트
+    public List<CustomerResponse> getAllCustomers(){
+        return customerRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    //ID로 특정 고객사 정보 조회
+    public CustomerResponse getCustomerById(Long id){
+        Optional<Customer> customer = customerRepository.findById(id);
+        return customer.map(this::convertToDTO).orElse(null);
+    }
+
+
+    private CustomerResponse convertToDTO(Customer customer){
+        return new CustomerResponse(
+                customer.getCustomerId(),
+                customer.getCustomerName(),
+                customer.getCustomerPhone(),
+                customer.getCustomerSdate(),
+                customer.getCustomerStatus().toString(),
+                customer.getCustomerAddress(),
+                customer.getCustomerAdddetail(),
+                customer.getCustomerPersonName(),
+                customer.getCustomerPersonPhone(),
+                customer.getCustomerPersonEmail(),
+                customer.getRegistrationNumber(),
+                customer.getCustomerNote(),
+                customer.getUser().getUserName(), // User의 이름
+                customer.getUser().getUserId()    // User의 ID
+        );
+    }
+
+    // 이름으로 고객사 검색
+    public List<CustomerResponse> searchCustomersByName(String customerName) {
+        return customerRepository.findByCustomerNameContaining(customerName).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
 }
