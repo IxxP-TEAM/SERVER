@@ -48,11 +48,23 @@ public class CustomerController {
     }
 
 
+    //고객사 삭제
     @DeleteMapping("/{id}")
     public ApiResponse<String> deleteCustomerById(@PathVariable Long id){
         boolean isDeleted = customerService.deleteCustomerById(id);
         if(isDeleted) {
             return ApiResponse.of("고객사가 성공적으로 삭제되었습니다.");
         }else{return null;}
+    }
+
+    //고객사 수정
+    @PutMapping("/{id}")
+    public ApiResponse<CustomerResponse> updateCustomer(@PathVariable Long id,
+                                                        @AuthUser User user,
+                                                        @RequestBody CustomerDTO request){
+
+        CustomerResponse updatedCustomer = customerService.updateCustomer(id,user,request);
+
+        return ApiResponse.of(updatedCustomer);
     }
 }
