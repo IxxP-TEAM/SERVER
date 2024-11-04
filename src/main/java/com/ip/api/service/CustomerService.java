@@ -2,6 +2,7 @@ package com.ip.api.service;
 
 import com.ip.api.domain.Customer;
 import com.ip.api.domain.User;
+import com.ip.api.dto.customer.CustomerRequest;
 import com.ip.api.dto.customer.CustomerRequest.CustomerDTO;
 import com.ip.api.dto.customer.CustomerResponse;
 import com.ip.api.repository.CustomerRepository;
@@ -102,6 +103,48 @@ public class CustomerService {
             return true;
         }else{
             return false;
+        }
+    }
+
+    //고객사 수정
+    public CustomerResponse updateCustomer(Long id, User user, CustomerDTO customerRequest){
+        Optional<Customer> existingCustomer = customerRepository.findById(id);
+
+        if(existingCustomer.isPresent()){
+            Customer customer = existingCustomer.get();
+            customer.setCustomerName(customerRequest.getCustomerName());
+            customer.setCustomerPhone(customerRequest.getCustomerPhone());
+            customer.setCustomerSdate(customerRequest.getCustomerSdate());
+            customer.setCustomerStatus(customerRequest.getCustomerStatus());
+            customer.setCustomerAddress(customerRequest.getCustomerAddress());
+            customer.setCustomerAdddetail(customerRequest.getCustomerAdddetail());
+            customer.setCustomerPersonName(customerRequest.getCustomerPersonName());
+            customer.setCustomerPersonPhone(customerRequest.getCustomerPersonPhone());
+            customer.setCustomerPersonEmail(customerRequest.getCustomerPersonEmail());
+            customer.setRegistrationNumber(customerRequest.getRegistrationNumber());
+            customer.setCustomerNote(customerRequest.getCustomerNote());
+            customer.setUser(user); // 담당자 정보 업데이트
+
+            Customer updatedCustomer = customerRepository.save(customer);
+
+            return new CustomerResponse(
+                    updatedCustomer.getCustomerId(),
+                    updatedCustomer.getCustomerName(),
+                    updatedCustomer.getCustomerPhone(),
+                    updatedCustomer.getCustomerSdate(),
+                    updatedCustomer.getCustomerStatus().toString(),
+                    updatedCustomer.getCustomerAddress(),
+                    updatedCustomer.getCustomerAdddetail(),
+                    updatedCustomer.getCustomerPersonName(),
+                    updatedCustomer.getCustomerPersonPhone(),
+                    updatedCustomer.getCustomerPersonEmail(),
+                    updatedCustomer.getRegistrationNumber(),
+                    updatedCustomer.getCustomerNote(),
+                    user.getUserName(), // User의 이름
+                    user.getUserId()    // User의 ID
+            );
+        }else {
+            return null;
         }
     }
 
