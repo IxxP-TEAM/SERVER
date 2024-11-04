@@ -9,7 +9,6 @@ import com.ip.api.dto.user.UserRequest.PasswordDTO;
 import com.ip.api.dto.user.UserResponse.PasswordResult;
 import com.ip.api.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +28,7 @@ public class UserController {
     }
 
     // 로그인
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ApiResponse<JwtTokenDto> login(@RequestBody LoginDTO request) {
         JwtTokenDto response = userService.login(request);
         return ApiResponse.of(response);

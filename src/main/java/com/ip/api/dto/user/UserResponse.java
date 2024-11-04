@@ -1,5 +1,8 @@
 package com.ip.api.dto.user;
 
+import com.ip.api.domain.enums.Department;
+import com.ip.api.domain.enums.UserStatus;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,5 +15,31 @@ public class UserResponse {
     @AllArgsConstructor
     public static class PasswordResult {
         Long userId;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ListForPaging<T> {
+        private long totalElements;
+        private int totalPages;
+        private int pageSize;
+        private int currentPage;
+        private List<T> items;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserDTO {
+        private long userIdx;
+        private String name;
+        private String email;
+        private Department department;
+        private String jobtitle;
+        private String userPhone;
+        private UserStatus status;
     }
 }
