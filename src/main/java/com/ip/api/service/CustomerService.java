@@ -84,8 +84,8 @@ public class CustomerService {
                 customer.getCustomerPersonEmail(),
                 customer.getRegistrationNumber(),
                 customer.getCustomerNote(),
-                customer.getUser().getUserName(), // User의 이름
-                customer.getUser().getUserId()    // User의 ID
+                customer.getUser() != null ? customer.getUser().getUserName() : "", // User가 null일 경우 빈 문자열 반환
+                customer.getUser() != null ? customer.getUser().getUserId() : null   // User가 null일 경우 null 반환
         );
     }
 
@@ -107,22 +107,46 @@ public class CustomerService {
     }
 
     //고객사 수정
-    public CustomerResponse updateCustomer(Long id, User user, CustomerDTO customerRequest){
+    public CustomerResponse updateCustomer(Long id, User user, CustomerDTO customerRequest) {
         Optional<Customer> existingCustomer = customerRepository.findById(id);
 
-        if(existingCustomer.isPresent()){
+        if (existingCustomer.isPresent()) {
             Customer customer = existingCustomer.get();
-            customer.setCustomerName(customerRequest.getCustomerName());
-            customer.setCustomerPhone(customerRequest.getCustomerPhone());
-            customer.setCustomerSdate(customerRequest.getCustomerSdate());
-            customer.setCustomerStatus(customerRequest.getCustomerStatus());
-            customer.setCustomerAddress(customerRequest.getCustomerAddress());
-            customer.setCustomerAdddetail(customerRequest.getCustomerAdddetail());
-            customer.setCustomerPersonName(customerRequest.getCustomerPersonName());
-            customer.setCustomerPersonPhone(customerRequest.getCustomerPersonPhone());
-            customer.setCustomerPersonEmail(customerRequest.getCustomerPersonEmail());
-            customer.setRegistrationNumber(customerRequest.getRegistrationNumber());
-            customer.setCustomerNote(customerRequest.getCustomerNote());
+
+            if (customerRequest.getCustomerName() != null) {
+                customer.setCustomerName(customerRequest.getCustomerName());
+            }
+            if (customerRequest.getCustomerPhone() != null) {
+                customer.setCustomerPhone(customerRequest.getCustomerPhone());
+            }
+            if (customerRequest.getCustomerSdate() != null) {
+                customer.setCustomerSdate(customerRequest.getCustomerSdate());
+            }
+            if (customerRequest.getCustomerStatus() != null) {
+                customer.setCustomerStatus(customerRequest.getCustomerStatus());
+            }
+            if (customerRequest.getCustomerAddress() != null) {
+                customer.setCustomerAddress(customerRequest.getCustomerAddress());
+            }
+            if (customerRequest.getCustomerAdddetail() != null) {
+                customer.setCustomerAdddetail(customerRequest.getCustomerAdddetail());
+            }
+            if (customerRequest.getCustomerPersonName() != null) {
+                customer.setCustomerPersonName(customerRequest.getCustomerPersonName());
+            }
+            if (customerRequest.getCustomerPersonPhone() != null) {
+                customer.setCustomerPersonPhone(customerRequest.getCustomerPersonPhone());
+            }
+            if (customerRequest.getCustomerPersonEmail() != null) {
+                customer.setCustomerPersonEmail(customerRequest.getCustomerPersonEmail());
+            }
+            if (customerRequest.getRegistrationNumber() != null) {
+                customer.setRegistrationNumber(customerRequest.getRegistrationNumber());
+            }
+            if (customerRequest.getCustomerNote() != null) {
+                customer.setCustomerNote(customerRequest.getCustomerNote());
+            }
+
             customer.setUser(user); // 담당자 정보 업데이트
 
             Customer updatedCustomer = customerRepository.save(customer);
@@ -140,12 +164,13 @@ public class CustomerService {
                     updatedCustomer.getCustomerPersonEmail(),
                     updatedCustomer.getRegistrationNumber(),
                     updatedCustomer.getCustomerNote(),
-                    user.getUserName(), // User의 이름
-                    user.getUserId()    // User의 ID
+                    user.getUserName(),
+                    user.getUserId()
             );
-        }else {
+        } else {
             return null;
         }
     }
+
 
 }

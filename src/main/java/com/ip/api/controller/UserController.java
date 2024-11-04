@@ -29,7 +29,7 @@ public class UserController {
     }
 
     // 로그인
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ApiResponse<JwtTokenDto> login(@RequestBody LoginDTO request) {
         JwtTokenDto response = userService.login(request);
         return ApiResponse.of(response);
