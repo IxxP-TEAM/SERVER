@@ -95,4 +95,14 @@ public class CustomerService {
                 .collect(Collectors.toList());
     }
 
+    //고객사 삭제
+    public boolean deleteCustomerById(Long id){
+        if(customerRepository.existsById(id)){
+            customerRepository.deleteById(id);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 }
