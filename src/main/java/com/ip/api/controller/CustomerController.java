@@ -58,13 +58,11 @@ public class CustomerController {
     }
 
     //고객사 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ApiResponse<CustomerResponse> updateCustomer(@PathVariable Long id,
                                                         @AuthUser User user,
                                                         @RequestBody CustomerDTO request){
-
         CustomerResponse updatedCustomer = customerService.updateCustomer(id,user,request);
-
         return ApiResponse.of(updatedCustomer);
     }
 }
