@@ -123,7 +123,7 @@ public class CustomerService {
             customer.setCustomerPersonEmail(customerRequest.getCustomerPersonEmail());
             customer.setRegistrationNumber(customerRequest.getRegistrationNumber());
             customer.setCustomerNote(customerRequest.getCustomerNote());
-            customer.setUser(user); // 담당자 정보 업데이트
+            customer.setUser(user);
 
             Customer updatedCustomer = customerRepository.save(customer);
 

@@ -1,5 +1,6 @@
 package com.ip.api.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ip.api.domain.enums.Department;
 import com.ip.api.domain.enums.UserStatus;
 import java.util.List;
@@ -33,6 +34,7 @@ public class UserResponse {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class UserDTO {
         private long userIdx;
         private String name;

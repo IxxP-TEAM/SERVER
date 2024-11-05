@@ -15,6 +15,7 @@ public enum ErrorCode {
     USER_EMAIL_SEND_FAIL(HttpStatus.BAD_REQUEST, "USER-002", "이메일 발송에 실패하였습니다."),
     USER_PASSWORD_INVALID(HttpStatus.BAD_REQUEST, "USER-003", "비밀번호 형식이 맞지 않습니다."),
     USER_BAD_CREDENTIAL(HttpStatus.BAD_REQUEST, "USER-004", "잘못된 이메일 혹은 비밀번호입니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER-005", "수정할 사용자를 찾을 수 없습니다."),
     USER_AUTHENTICATION_FAIL(HttpStatus.BAD_REQUEST, "USER-005", "인증 실패")
     ;
 

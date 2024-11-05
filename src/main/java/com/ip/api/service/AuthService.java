@@ -3,9 +3,7 @@ package com.ip.api.service;
 import com.ip.api.apiPayload.code.ErrorCode;
 import com.ip.api.apiPayload.exception.BadRequestException;
 import com.ip.api.domain.User;
-import com.ip.api.domain.enums.Department;
 import com.ip.api.domain.enums.Role;
-import com.ip.api.domain.enums.UserStatus;
 import com.ip.api.dto.user.UserRequest.UserJoinDTO;
 import com.ip.api.repository.UserRepository;
 import jakarta.mail.MessagingException;
@@ -38,10 +36,10 @@ public class AuthService {
                 .userPhone(request.getUserPhone())
                 .hireDate(request.getHireDate())
                 .jobTitle(request.getJobTitle())
-                .department(Department.valueOf(request.getDepartment()))
+                .department(request.getDepartment())
                 .password(passwordEncoder.encode("0000"))
                 .role(Role.ROLE_USER)
-                .userStatus(UserStatus.valueOf(request.getUserStatus()))
+                .userStatus(request.getUserStatus())
                 .build();
 
         if (userRepository.existsByEmail(user.getEmail())) {
