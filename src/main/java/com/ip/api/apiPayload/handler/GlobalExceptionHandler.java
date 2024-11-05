@@ -3,6 +3,7 @@ package com.ip.api.apiPayload.handler;
 import com.ip.api.apiPayload.code.ApiResponse;
 import com.ip.api.apiPayload.code.ErrorCode;
 import com.ip.api.apiPayload.exception.BusinessBaseException;
+import java.nio.file.AccessDeniedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -36,6 +37,12 @@ public class GlobalExceptionHandler{
         return new ResponseEntity<>(
                 ApiResponse.of(errorCode),
                 errorCode.getStatus());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    protected ResponseEntity<ApiResponse> handleAccessDeniedException(AccessDeniedException e) {
+        log.error("AccessDeniedException", e);
+        return createErrorResponseEntity(ErrorCode.USER_AUTHENTICATION_FAIL);
     }
 }
 

@@ -1,6 +1,9 @@
 package com.ip.api.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ip.api.domain.enums.Department;
+import com.ip.api.domain.enums.UserStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -15,6 +18,7 @@ public class UserRequest {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class UserJoinDTO {
         @Email(message = "이메일 형식이 아닙니다.")
         @JsonProperty("email")
@@ -26,8 +30,8 @@ public class UserRequest {
         private String userPhone;
         private LocalDate hireDate;
         private String jobTitle;
-        private String department;
-        private String userStatus;
+        private Department department;
+        private UserStatus userStatus;
     }
 
     @Getter
