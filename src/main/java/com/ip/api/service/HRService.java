@@ -75,4 +75,14 @@ public class HRService {
                 .userIdx(updateUser.getUserId())
                 .build();
     }
+
+    public UserDTO deleteUserInfo(long userId) {
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        userRepository.delete(existingUser);
+        return UserDTO.builder()
+                .userIdx(existingUser.getUserId())
+                .build();
+    }
 }

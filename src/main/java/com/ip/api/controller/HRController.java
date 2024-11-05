@@ -9,6 +9,7 @@ import com.ip.api.dto.user.UserResponse.UserDTO;
 import com.ip.api.service.HRService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +39,14 @@ public class HRController {
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<UserDTO> updateUserInfo(@AuthUser User user, @PathVariable long userId, @RequestBody UserJoinDTO request) {
         UserDTO response = hrService.updateUserInfo(userId, request);
+        return ApiResponse.of(response);
+    }
+
+    // 직원 정보 삭제
+    @DeleteMapping("/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<UserDTO> deleteUserInfo(@AuthUser User user, @PathVariable long userId) {
+        UserDTO response = hrService.deleteUserInfo(userId);
         return ApiResponse.of(response);
     }
 }
