@@ -28,4 +28,10 @@ public class Product extends BaseEntity {
     private ProductType productType;
     @Column(nullable = false)
     private int safetyStockQuantity;
+    
+    public void updateProduct(String productName, ProductType productType, int safetyStockQuantity) {
+        this.productName = productName;
+        this.productType = productType;
+        this.safetyStockQuantity = safetyStockQuantity;
+    }
 }
