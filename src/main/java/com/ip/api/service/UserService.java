@@ -5,11 +5,7 @@ import com.ip.api.apiPayload.exception.BadRequestException;
 import com.ip.api.config.security.CustomUserDetails;
 import com.ip.api.config.security.JwtTokenDto;
 import com.ip.api.config.security.JwtUtil;
-import com.ip.api.domain.User;
 import com.ip.api.dto.user.UserRequest.LoginDTO;
-import com.ip.api.dto.user.UserRequest.PasswordDTO;
-import com.ip.api.dto.user.UserResponse.PasswordResult;
-import com.ip.api.repository.UserRepository;
 import java.util.Collection;
 import java.util.Iterator;
 import lombok.RequiredArgsConstructor;
@@ -19,45 +15,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-
-    public PasswordResult changePassword(User user, PasswordDTO request) {
-        if (!request.isValidPassword()) {
-            throw new BadRequestException(ErrorCode.USER_PASSWORD_INVALID);
-        }
-        // 새로운 User 객체 생성
-        User updatedUser = User.builder()
-                .userId(user.getUserId())
-                .connId(user.getConnId())
-                .email(user.getEmail())
-                .userName(user.getUserName())
-                .birth(user.getBirth())
-                .userPhone(user.getUserPhone())
-                .hireDate(user.getHireDate())
-                .jobTitle(user.getJobTitle())
-                .department(user.getDepartment())
-                .address(user.getAddress())
-                .role(user.getRole())
-                .password(passwordEncoder.encode(request.getNewPassword()))
-                .userStatus(user.getUserStatus())
-                .build();
-
-        // 새 User 객체 저장
-        userRepository.save(updatedUser);
-
-        return PasswordResult.builder()
-                .userId(updatedUser.getUserId())
-                .build();
-    }
 
     public JwtTokenDto login(LoginDTO request) {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(request.getConnId(), request.getPassword());
