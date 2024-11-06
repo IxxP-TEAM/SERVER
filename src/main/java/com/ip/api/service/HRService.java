@@ -127,6 +127,8 @@ public class HRService {
                         userEntity.getAddress(),
                         userEntity.getEmail(),
                         userEntity.getDepartment(),
+                        userEntity.getBirth(),
+                        userEntity.getHireDate(),
                         userEntity.getJobTitle(),
                         userEntity.getUserPhone(),
                         userEntity.getUserStatus()
@@ -189,9 +191,11 @@ public class HRService {
                 .name(user.getUserName())
                 .userPhone(user.getUserPhone())
                 .department(user.getDepartment())
-                .jobtitle(user.getJobTitle())
+                .jobTitle(user.getJobTitle())
+                .birth(user.getBirth())
+                .hireDate(user.getHireDate())
                 .email(user.getEmail())
-                .status(user.getUserStatus())
+                .userStatus(user.getUserStatus())
                 .address(user.getAddress())
                 .build();
     }
