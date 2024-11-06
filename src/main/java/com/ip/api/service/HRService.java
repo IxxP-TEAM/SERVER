@@ -3,13 +3,21 @@ package com.ip.api.service;
 import com.ip.api.apiPayload.code.ErrorCode;
 import com.ip.api.apiPayload.exception.BadRequestException;
 import com.ip.api.apiPayload.exception.NotFoundException;
+import com.ip.api.domain.PwResetCodes;
 import com.ip.api.domain.User;
 import com.ip.api.dto.user.UserRequest.PasswordDTO;
+import com.ip.api.dto.user.UserRequest.ResetPwDTO;
 import com.ip.api.dto.user.UserRequest.UserJoinDTO;
+import com.ip.api.dto.user.UserResponse.EmailCodeDTO;
 import com.ip.api.dto.user.UserResponse.ListForPaging;
 import com.ip.api.dto.user.UserResponse.PasswordResult;
 import com.ip.api.dto.user.UserResponse.UserDTO;
+import com.ip.api.repository.PwResetCodesRepository;
 import com.ip.api.repository.UserRepository;
+import jakarta.mail.MessagingException;
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +32,60 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class HRService {
     private final UserRepository userRepository;
+    private final PwResetCodesRepository pwRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private static final long CODE_VALIDITY_DURATION_MINUTES = 10;
 
-    public PasswordResult changePassword(User user, PasswordDTO request) {
+    public EmailCodeDTO sendVerificationCode(ResetPwDTO request) {
+        User user = userRepository.findByEmail(request.getEmail());
+
+        if (user == null) {
+            throw new NotFoundException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        if (!user.getEmail().equals(request.getEmail())) {
+            throw new NotFoundException(ErrorCode.USER_VERIFICATION_FAIL);
+        }
+        String resetCode = generateRandomCode();
+        try {
+            emailService.sendPasswordResetCodeEmail(resetCode, user.getEmail(), user.getUserName()); // 이메일 발송 메서드 호출
+        } catch (MessagingException e) {
+            throw new BadRequestException(ErrorCode.USER_EMAIL_SEND_FAIL);
+        }
+
+        PwResetCodes addResetCode = PwResetCodes.builder()
+                .email(request.getEmail())
+                .verificationCode(resetCode)
+                .expirationTime(LocalDateTime.now())
+                .build();
+
+        pwRepository.save(addResetCode);
+
+        return EmailCodeDTO.builder()
+                .code(resetCode)
+                .build();
+    }
+
+    public PasswordResult changePassword(PasswordDTO request) {
+        User user = userRepository.findByEmail(request.getEmail());
+
+        // 인증코드 유효시간 검증
+        PwResetCodes pwResetCodes = pwRepository.findByVerificationCode(request.getCode());
+
+        if (pwResetCodes == null) {
+            throw new NotFoundException(ErrorCode.CODE_NOT_FOUND);
+        }
+
+        if (!pwResetCodes.getVerificationCode().equals(request.getCode())) {
+            throw new BadRequestException(ErrorCode.USER_AUTHENTICATION_FAIL);
+        }
+
+        long minutesElaspsed = ChronoUnit.MINUTES.between(pwResetCodes.getCreatedAt(), LocalDateTime.now());
+        if (minutesElaspsed > CODE_VALIDITY_DURATION_MINUTES) {
+            throw new BadRequestException(ErrorCode.CODE_EXPIRATION_TIME);
+        }
+
         if (!request.isValidPassword()) {
             throw new BadRequestException(ErrorCode.USER_PASSWORD_INVALID);
         }
@@ -134,5 +193,11 @@ public class HRService {
                 .status(user.getUserStatus())
                 .address(user.getAddress())
                 .build();
+    }
+
+    private String generateRandomCode() {
+        SecureRandom random = new SecureRandom();
+        int code = 100000 + random.nextInt(900000); // 100000~999999 범위 내 숫자 생성
+        return String.valueOf(code);
     }
 }

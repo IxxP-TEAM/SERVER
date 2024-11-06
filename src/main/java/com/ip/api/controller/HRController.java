@@ -4,7 +4,9 @@ import com.ip.api.apiPayload.code.ApiResponse;
 import com.ip.api.auth.AuthUser;
 import com.ip.api.domain.User;
 import com.ip.api.dto.user.UserRequest.PasswordDTO;
+import com.ip.api.dto.user.UserRequest.ResetPwDTO;
 import com.ip.api.dto.user.UserRequest.UserJoinDTO;
+import com.ip.api.dto.user.UserResponse.EmailCodeDTO;
 import com.ip.api.dto.user.UserResponse.ListForPaging;
 import com.ip.api.dto.user.UserResponse.PasswordResult;
 import com.ip.api.dto.user.UserResponse.UserDTO;
@@ -62,9 +64,16 @@ public class HRController {
     }
 
     //사용자 비밀번호 설정
-    @PostMapping("/resetPassword")
-    public ApiResponse<PasswordResult> changePassword(@AuthUser User user, @RequestBody PasswordDTO request) {
-        PasswordResult response = hrService.changePassword(user, request);
+    @PostMapping("/reset-pw")
+    public ApiResponse<PasswordResult> changePassword(@RequestBody PasswordDTO request) {
+        PasswordResult response = hrService.changePassword(request);
+        return ApiResponse.of(response);
+    }
+
+    // 이메일 인증코드 발솔
+    @PostMapping("/email-code")
+    public ApiResponse<EmailCodeDTO> sendVerificationCode(@RequestBody ResetPwDTO request) {
+        EmailCodeDTO response = hrService.sendVerificationCode(request);
         return ApiResponse.of(response);
     }
 }
