@@ -76,4 +76,12 @@ public class HRController {
         EmailCodeDTO response = hrService.sendVerificationCode(request);
         return ApiResponse.of(response);
     }
+
+     // 직원 상태 변경
+    @PatchMapping("/status/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<UserDTO> updateUserStatus(@PathVariable long userId) {
+        UserDTO response = hrService.updateUserStatus(userId);
+        return ApiResponse.of(response);
+    }
 }
