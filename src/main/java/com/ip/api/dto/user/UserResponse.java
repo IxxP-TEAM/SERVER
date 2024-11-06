@@ -45,4 +45,13 @@ public class UserResponse {
         private String userPhone;
         private UserStatus status;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class EmailCodeDTO {
+        private String code;
+    }
 }

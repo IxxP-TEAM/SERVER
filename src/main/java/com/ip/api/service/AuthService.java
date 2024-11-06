@@ -22,7 +22,7 @@ public class AuthService {
         // 이메일 발송
         String connId = generatedId(request.getEmail());
         try {
-            emailService.sendEmail(connId, request.getEmail(), request.getName());
+            emailService.sendIdNotificationEmail(connId, request.getEmail(), request.getName());
         } catch (MessagingException e) {
             throw new BadRequestException(ErrorCode.USER_EMAIL_SEND_FAIL);
         }
