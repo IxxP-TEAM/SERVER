@@ -3,6 +3,7 @@ package com.ip.api.dto.user;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ip.api.domain.enums.Department;
 import com.ip.api.domain.enums.UserStatus;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,9 +42,11 @@ public class UserResponse {
         private String address;
         private String email;
         private Department department;
-        private String jobtitle;
+        private String birth;
+        private LocalDate hireDate;
+        private String jobTitle;
         private String userPhone;
-        private UserStatus status;
+        private UserStatus userStatus;
     }
 
     @Builder
