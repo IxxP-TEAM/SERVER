@@ -1,10 +1,13 @@
 package com.ip.api.service;
 
 import com.ip.api.apiPayload.code.ErrorCode;
+import com.ip.api.apiPayload.exception.BadRequestException;
 import com.ip.api.apiPayload.exception.NotFoundException;
 import com.ip.api.domain.User;
+import com.ip.api.dto.user.UserRequest.PasswordDTO;
 import com.ip.api.dto.user.UserRequest.UserJoinDTO;
 import com.ip.api.dto.user.UserResponse.ListForPaging;
+import com.ip.api.dto.user.UserResponse.PasswordResult;
 import com.ip.api.dto.user.UserResponse.UserDTO;
 import com.ip.api.repository.UserRepository;
 import java.util.List;
@@ -13,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +24,36 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class HRService {
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    public PasswordResult changePassword(User user, PasswordDTO request) {
+        if (!request.isValidPassword()) {
+            throw new BadRequestException(ErrorCode.USER_PASSWORD_INVALID);
+        }
+        // 새로운 User 객체 생성
+        User updatedUser = User.builder()
+                .userId(user.getUserId())
+                .connId(user.getConnId())
+                .email(user.getEmail())
+                .userName(user.getUserName())
+                .birth(user.getBirth())
+                .userPhone(user.getUserPhone())
+                .hireDate(user.getHireDate())
+                .jobTitle(user.getJobTitle())
+                .department(user.getDepartment())
+                .address(user.getAddress())
+                .role(user.getRole())
+                .password(passwordEncoder.encode(request.getNewPassword()))
+                .userStatus(user.getUserStatus())
+                .build();
+
+        // 새 User 객체 저장
+        userRepository.save(updatedUser);
+
+        return PasswordResult.builder()
+                .userId(updatedUser.getUserId())
+                .build();
+    }
 
     public ListForPaging getUserList(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -30,6 +64,7 @@ public class HRService {
                 .map(userEntity -> new UserDTO(
                         userEntity.getUserId(),
                         userEntity.getUserName(),
+                        userEntity.getAddress(),
                         userEntity.getEmail(),
                         userEntity.getDepartment(),
                         userEntity.getJobTitle(),
@@ -83,6 +118,21 @@ public class HRService {
         userRepository.delete(existingUser);
         return UserDTO.builder()
                 .userIdx(existingUser.getUserId())
+                .build();
+    }
+
+    public UserDTO getUserInfo(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        return UserDTO.builder()
+                .userIdx(user.getUserId())
+                .name(user.getUserName())
+                .userPhone(user.getUserPhone())
+                .department(user.getDepartment())
+                .jobtitle(user.getJobTitle())
+                .email(user.getEmail())
+                .status(user.getUserStatus())
+                .address(user.getAddress())
                 .build();
     }
 }

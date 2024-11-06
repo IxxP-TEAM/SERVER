@@ -38,6 +38,7 @@ public class UserResponse {
     public static class UserDTO {
         private long userIdx;
         private String name;
+        private String address;
         private String email;
         private Department department;
         private String jobtitle;
