@@ -2,7 +2,6 @@ package com.ip.api.service;
 
 import com.ip.api.domain.Customer;
 import com.ip.api.domain.User;
-import com.ip.api.dto.customer.CustomerRequest;
 import com.ip.api.dto.customer.CustomerRequest.CustomerDTO;
 import com.ip.api.dto.customer.CustomerResponse;
 import com.ip.api.repository.CustomerRepository;
@@ -32,45 +31,36 @@ public class CustomerService {
                 .customerPersonEmail(customerRequest.getCustomerPersonEmail())
                 .registrationNumber(customerRequest.getRegistrationNumber())
                 .customerNote(customerRequest.getCustomerNote())
-                .user(user)
+                .user(user)  // user가 null일 수 있음에 유의
                 .build();
 
         Customer savedCustomer = customerRepository.save(customer);
 
         // CustomerResponse로 변환하여 반환
-        return new CustomerResponse(
-                savedCustomer.getCustomerId(),
-                savedCustomer.getCustomerName(),
-                savedCustomer.getCustomerPhone(),
-                savedCustomer.getCustomerSdate(),
-                savedCustomer.getCustomerStatus().toString(),
-                savedCustomer.getCustomerAddress(),
-                savedCustomer.getCustomerAdddetail(),
-                savedCustomer.getCustomerPersonName(),
-                savedCustomer.getCustomerPersonPhone(),
-                savedCustomer.getCustomerPersonEmail(),
-                savedCustomer.getRegistrationNumber(),
-                savedCustomer.getCustomerNote(),
-                user.getUserName(),
-                user.getUserId()// User의 이름만 포함
-        );
+        return convertToDTO(savedCustomer);
     }
 
-    // 모든 고객 정보 리스트
-    public List<CustomerResponse> getAllCustomers(){
+    public List<CustomerResponse> getAllCustomers() {
         return customerRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    //ID로 특정 고객사 정보 조회
-    public CustomerResponse getCustomerById(Long id){
+    public CustomerResponse getCustomerById(Long id) {
         Optional<Customer> customer = customerRepository.findById(id);
         return customer.map(this::convertToDTO).orElse(null);
     }
 
+    // 사업자등록번호 중복 확인 메서드
+    public boolean isRegistrationNumberDuplicate(String registrationNumber) {
+        return customerRepository.existsByRegistrationNumber(registrationNumber);
+    }
 
-    private CustomerResponse convertToDTO(Customer customer){
+    private CustomerResponse convertToDTO(Customer customer) {
+        // user가 null일 때 userName과 userId 필드 처리
+        String userName = customer.getUser() != null ? customer.getUser().getUserName() : "정보 없음";
+        Long userId = customer.getUser() != null ? customer.getUser().getUserId() : null;
+
         return new CustomerResponse(
                 customer.getCustomerId(),
                 customer.getCustomerName(),
@@ -84,29 +74,26 @@ public class CustomerService {
                 customer.getCustomerPersonEmail(),
                 customer.getRegistrationNumber(),
                 customer.getCustomerNote(),
-                customer.getUser() != null ? customer.getUser().getUserName() : "", // User가 null일 경우 빈 문자열 반환
-                customer.getUser() != null ? customer.getUser().getUserId() : null   // User가 null일 경우 null 반환
+                userName,
+                userId
         );
     }
 
-    // 이름으로 고객사 검색
     public List<CustomerResponse> searchCustomersByName(String customerName) {
         return customerRepository.findByCustomerNameContaining(customerName).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    //고객사 삭제
-    public boolean deleteCustomerById(Long id){
-        if(customerRepository.existsById(id)){
+    public boolean deleteCustomerById(Long id) {
+        if (customerRepository.existsById(id)) {
             customerRepository.deleteById(id);
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
-    //고객사 수정
     public CustomerResponse updateCustomer(Long id, User user, CustomerDTO customerRequest) {
         Optional<Customer> existingCustomer = customerRepository.findById(id);
 
@@ -147,30 +134,13 @@ public class CustomerService {
                 customer.setCustomerNote(customerRequest.getCustomerNote());
             }
 
-            customer.setUser(user); // 담당자 정보 업데이트
+            customer.setUser(user); // user가 null일 가능성에 대비
 
             Customer updatedCustomer = customerRepository.save(customer);
 
-            return new CustomerResponse(
-                    updatedCustomer.getCustomerId(),
-                    updatedCustomer.getCustomerName(),
-                    updatedCustomer.getCustomerPhone(),
-                    updatedCustomer.getCustomerSdate(),
-                    updatedCustomer.getCustomerStatus().toString(),
-                    updatedCustomer.getCustomerAddress(),
-                    updatedCustomer.getCustomerAdddetail(),
-                    updatedCustomer.getCustomerPersonName(),
-                    updatedCustomer.getCustomerPersonPhone(),
-                    updatedCustomer.getCustomerPersonEmail(),
-                    updatedCustomer.getRegistrationNumber(),
-                    updatedCustomer.getCustomerNote(),
-                    user.getUserName(),
-                    user.getUserId()
-            );
+            return convertToDTO(updatedCustomer);
         } else {
             return null;
         }
     }
-
-
 }
