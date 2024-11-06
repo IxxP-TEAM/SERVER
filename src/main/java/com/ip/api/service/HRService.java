@@ -5,6 +5,7 @@ import com.ip.api.apiPayload.exception.BadRequestException;
 import com.ip.api.apiPayload.exception.NotFoundException;
 import com.ip.api.domain.PwResetCodes;
 import com.ip.api.domain.User;
+import com.ip.api.domain.enums.UserStatus;
 import com.ip.api.dto.user.UserRequest.PasswordDTO;
 import com.ip.api.dto.user.UserRequest.ResetPwDTO;
 import com.ip.api.dto.user.UserRequest.UserJoinDTO;
@@ -199,5 +200,30 @@ public class HRService {
         SecureRandom random = new SecureRandom();
         int code = 100000 + random.nextInt(900000); // 100000~999999 범위 내 숫자 생성
         return String.valueOf(code);
+    }
+
+    public UserDTO updateUserStatus(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        User updateUser = User.builder()
+                .userId(user.getUserId())
+                .userName(user.getUserName())
+                .email(user.getEmail())
+                .birth(user.getBirth())
+                .hireDate(user.getHireDate())
+                .connId(user.getConnId())
+                .role(user.getRole())
+                .address(user.getAddress())
+                .password(user.getPassword())
+                .department(user.getDepartment())
+                .jobTitle(user.getJobTitle())
+                .userPhone(user.getUserPhone())
+                .userStatus(UserStatus.퇴사)
+                .build();
+        userRepository.save(updateUser);
+
+        return UserDTO.builder()
+                .userIdx(updateUser.getUserId())
+                .build();
     }
 }
