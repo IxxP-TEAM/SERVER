@@ -8,4 +8,6 @@ import java.util.List;
 public interface CustomerRepository extends JpaRepository<Customer,Long> {
 
     List<Customer> findByCustomerNameContaining(String customerName);
+    // 사업자등록번호 중복 여부 확인을 위한 쿼리 메서드
+    boolean existsByRegistrationNumber(String registrationNumber);
 }

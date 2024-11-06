@@ -10,7 +10,9 @@ import com.ip.api.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/customer")
@@ -65,4 +67,18 @@ public class CustomerController {
         CustomerResponse updatedCustomer = customerService.updateCustomer(id,user,request);
         return ApiResponse.of(updatedCustomer);
     }
+
+
+    // 사업자등록번호 중복 확인 엔드포인트
+    @PostMapping("/check-duplicate-registration-number")
+    public ApiResponse<Map<String, Boolean>> checkDuplicateRegistrationNumber(@RequestBody Map<String, String> request) {
+        String registrationNumber = request.get("registrationNumber");
+        boolean isDuplicate = customerService.isRegistrationNumberDuplicate(registrationNumber);
+
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isDuplicate", isDuplicate);
+
+        return ApiResponse.of(response); // 응답에 response 객체를 직접 전달
+    }
+
 }
