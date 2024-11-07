@@ -10,6 +10,9 @@ import com.ip.api.repository.OrdersRepository;
 import com.ip.api.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,15 +35,12 @@ public class OrderService {
     public OrderResponse createOrder(User user, OrderRequest.OrderDTO orderDTO) {
         // DTO를 Orders 엔티티로 변환
         Orders order = orderDTO.toEntity();
-
         // Customer를 데이터베이스에서 조회하고, 없을 시 예외 처리
         Customer customer = customerRepository.findById(orderDTO.getCustomerId())
                 .orElseThrow(() -> new EntityNotFoundException("Customer not found"));
-
         // Orders 엔티티에 user와 customer 설정
         order.setUser(user);
         order.setCustomer(customer);
-
         // 저장 후, 저장된 Orders 엔티티를 OrderResponse로 반환
         Orders savedOrder = ordersRepository.save(order);
         return new OrderResponse(savedOrder);
@@ -53,12 +53,16 @@ public class OrderService {
         return new OrderResponse(order); // 주문을 응답 객체로 반환
     }
 
-    // 모든 주문 조회 메서드
-    public List<OrderResponse> getAllOrders() {
-        return ordersRepository.findAll()
-                .stream()
-                .map(OrderResponse::new) // 주문을 응답 객체로 변환
-                .collect(Collectors.toList());
+    // 모든 주문 조회 메서드 (페이징 적용)
+    public Page<OrderResponse> getAllOrders(int page, int size) {
+        // PageRequest 객체 생성: 페이지 번호와 페이지 크기를 설정합니다.
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 페이징된 결과를 OrdersRepository에서 가져옵니다.
+        Page<Orders> ordersPage = ordersRepository.findAll(pageable);
+
+        // Orders 객체를 OrderResponse 객체로 매핑하여 반환합니다.
+        return ordersPage.map(OrderResponse::new);
     }
 
     // 주문 수정 메서드
