@@ -17,13 +17,16 @@ public enum ErrorCode {
     USER_BAD_CREDENTIAL(HttpStatus.BAD_REQUEST, "USER-004", "잘못된 이메일 혹은 비밀번호입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER-005", "수정할 사용자를 찾을 수 없습니다."),
     USER_AUTHENTICATION_FAIL(HttpStatus.BAD_REQUEST, "USER-005", "인증 실패"),
-    
+    USER_VERIFICATION_FAIL(HttpStatus.NOT_FOUND, "USER-006", "회원 등록시 입력했던 이메일을 입력해주세요."),
+    CODE_NOT_FOUND(HttpStatus.NOT_FOUND, "USER-007", "인증 코드가 존재하지 않습니다."),
+    CODE_EXPIRATION_TIME(HttpStatus.ACCEPTED, "USER-008", "인증 코드 유효 시간이 만료 되었습니다."),
+
     //product
     PRODUCT_NAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "PRODUCT-001", "이미 존재하는 제품입니다."),
-    
+
     ;
-	
-	
+
+
 
     private final String message;
 

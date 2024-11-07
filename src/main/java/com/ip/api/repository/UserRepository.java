@@ -10,4 +10,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByConnId(String connId);
     boolean existsByEmail(String email);
     Page<User> findAll(Pageable pageable);
+    User findByEmail(String email);
 }

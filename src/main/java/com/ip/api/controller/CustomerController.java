@@ -8,9 +8,13 @@ import com.ip.api.dto.customer.CustomerRequest.CustomerDTO;
 import com.ip.api.dto.customer.CustomerResponse;
 import com.ip.api.service.CustomerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/customer")
@@ -28,9 +32,8 @@ public class CustomerController {
 
     //모든 고객사 조회
     @GetMapping("/all")
-    public ApiResponse<List<CustomerResponse>> getAllCustomers(){
-        List<CustomerResponse> response = customerService.getAllCustomers();
-        return ApiResponse.of(response);
+    public Page<CustomerResponse> getAllCustomers(Pageable pageable) {
+        return customerService.getAllCustomers(pageable);
     }
 
     //특정 고객사 조회
@@ -42,9 +45,10 @@ public class CustomerController {
 
     //이름으로 고객사 조회
     @GetMapping("/search")
-    public ApiResponse<List<CustomerResponse>> searchCustomerByName(@RequestParam String name){
-        List<CustomerResponse> response = customerService.searchCustomersByName(name);
-        return ApiResponse.of(response);
+    public Page<CustomerResponse> searchCustomersByName(
+            @RequestParam String customerName,
+            Pageable pageable) {
+        return customerService.searchCustomersByName(customerName, pageable);
     }
 
 
@@ -65,4 +69,18 @@ public class CustomerController {
         CustomerResponse updatedCustomer = customerService.updateCustomer(id,user,request);
         return ApiResponse.of(updatedCustomer);
     }
+
+
+    // 사업자등록번호 중복 확인 엔드포인트
+    @PostMapping("/check-duplicate-registration-number")
+    public ApiResponse<Map<String, Boolean>> checkDuplicateRegistrationNumber(@RequestBody Map<String, String> request) {
+        String registrationNumber = request.get("registrationNumber");
+        boolean isDuplicate = customerService.isRegistrationNumberDuplicate(registrationNumber);
+
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isDuplicate", isDuplicate);
+
+        return ApiResponse.of(response); // 응답에 response 객체를 직접 전달
+    }
+
 }

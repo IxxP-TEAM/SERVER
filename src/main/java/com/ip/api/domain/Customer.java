@@ -2,12 +2,8 @@ package com.ip.api.domain;
 
 import com.ip.api.domain.common.BaseEntity;
 import com.ip.api.domain.enums.Status;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 
 import lombok.*;
@@ -30,6 +26,7 @@ public class Customer extends BaseEntity {
     private String customerPersonName;
     private String customerPersonPhone;
     private String customerPersonEmail;
+    @Column(unique = true)
     private String registrationNumber;
     private String customerNote;
     @ManyToOne

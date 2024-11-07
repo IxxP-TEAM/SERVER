@@ -39,6 +39,8 @@ public class UserRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PasswordDTO {
+        private String email;
+        private String code;
         @Size(max = 8, message = "비밀번호는 8자 이상이어야 합니다.")
         @JsonProperty("newPassword")
         private String newPassword;
@@ -66,5 +68,14 @@ public class UserRequest {
     public static class LoginDTO {
         private String connId;
         private String password;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ResetPwDTO {
+        @JsonProperty("email")
+        private String email;
     }
 }
