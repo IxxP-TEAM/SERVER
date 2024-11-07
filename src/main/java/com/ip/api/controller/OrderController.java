@@ -7,6 +7,7 @@ import com.ip.api.dto.order.OrderRequest.OrderDTO;
 import com.ip.api.dto.order.OrderResponse;
 import com.ip.api.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,8 +28,12 @@ public class OrderController {
 
     //전체 주문 조회
     @GetMapping("/all")
-    public ApiResponse<List<OrderResponse>> getAllOrders(){
-        List<OrderResponse> response = ordersService.getAllOrders();
+    public ApiResponse<Page<OrderResponse>> getAllOrders(
+            @RequestParam(defaultValue = "0") int page,  // 기본값으로 페이지 0 설정
+            @RequestParam(defaultValue = "10") int size  // 기본값으로 10개의 항목 설정
+    ) {
+        // OrderService에서 페이징 처리된 결과를 받습니다.
+        Page<OrderResponse> response = ordersService.getAllOrders(page, size);
         return ApiResponse.of(response);
     }
 
