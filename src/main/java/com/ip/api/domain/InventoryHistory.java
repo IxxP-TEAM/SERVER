@@ -6,12 +6,22 @@ import com.ip.api.domain.common.BaseEntity;
 import com.ip.api.domain.enums.ChangeType;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class InventoryHistory extends BaseEntity {
 
 	@Id
@@ -27,7 +37,6 @@ public class InventoryHistory extends BaseEntity {
 	private ChangeType changeType;
 	@Column(nullable = false)
 	private int changeQuantity;
-	@Column(nullable = false)
 	private LocalDate expirationDate;
 	@Column(nullable = false)
 	private LocalDate changeDate;
