@@ -63,7 +63,7 @@ public class OrderResponse {
         private String productName;
         private Long quantity;
         private BigDecimal price;
-        private BigDecimal subtotal;
+        private BigDecimal total;
         private BigDecimal discount;
         private BigDecimal tax;
 
@@ -71,8 +71,8 @@ public class OrderResponse {
             this.productId = orderProduct.getProduct().getProductId();
             this.productName = orderProduct.getProduct().getProductName();
             this.quantity = orderProduct.getQuantity();
-            //this.price = orderProduct.getPrice();
-            this.subtotal = orderProduct.getSubtotal();
+            this.price = orderProduct.getPrice();
+            this.total = orderProduct.getTotal();
             this.discount = orderProduct.getDiscount();
             this.tax = orderProduct.getTax();
         }

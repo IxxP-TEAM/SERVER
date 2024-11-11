@@ -48,31 +48,53 @@ public class OrderService {
 
         Orders savedOrder = ordersRepository.save(order);
 
-        orderDTO.getProducts().forEach(productDTO -> {
+        BigDecimal totalAmount = BigDecimal.ZERO;         // 총 가격
+        BigDecimal totalDiscountAmount = BigDecimal.ZERO; // 총 할인 금액
+        BigDecimal totalTaxAmount = BigDecimal.ZERO;      // 총 세액
+
+        // 각 제품에 대한 OrderProduct 생성 및 할인/세액 계산
+        for (OrderRequest.OrderProductDTO productDTO : orderDTO.getProducts()) {
             Product product = productRepository.findById(productDTO.getProductId())
                     .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+
+            BigDecimal originalPrice = BigDecimal.valueOf(product.getProductPrice());
+
+            // 할인율 적용하여 최종 가격 계산
+            BigDecimal discountAmount = originalPrice.multiply(productDTO.getDiscount().divide(BigDecimal.valueOf(100)));
+            BigDecimal finalPrice = originalPrice.subtract(discountAmount); // 할인 적용된 가격
+
+            // 제품의 총 가격(total) 계산 (세금 포함)
+            BigDecimal quantity = BigDecimal.valueOf(productDTO.getQuantity());
+            BigDecimal tax = finalPrice.multiply(quantity).multiply(BigDecimal.valueOf(0.1)); // 총 가격의 10%를 세액으로 계산
+            BigDecimal total = finalPrice.multiply(quantity).add(tax); // 세금 포함한 최종 금액
+
+            totalAmount = totalAmount.add(total); // 전체 주문 금액 누적
+            totalDiscountAmount = totalDiscountAmount.add(discountAmount.multiply(quantity)); // 전체 주문 할인 누적
+            totalTaxAmount = totalTaxAmount.add(tax); // 총 세액 누적
 
             OrderProduct orderProduct = OrderProduct.builder()
                     .product(product)
                     .quantity(productDTO.getQuantity())
-                   // .price(productDTO.getPrice())
-                    .discount(productDTO.getDiscount())
-                    .tax(productDTO.getTax())
-                  //  .subtotal(productDTO.getPrice().multiply(BigDecimal.valueOf(productDTO.getQuantity())))
+                    .price(finalPrice)            // 할인 적용된 가격 설정
+                    .discount(discountAmount)     // 개별 할인 금액
+                    .tax(tax)                     // 개별 세액 설정
+                    .total(total)              // 세금 포함 최종 금액 저장 (total로 변경 가능)
                     .order(savedOrder)
                     .build();
 
-            // OrderProduct를 명시적으로 저장
-            orderProductRepository.save(orderProduct);
+            orderProductRepository.save(orderProduct); // OrderProduct 저장
+            savedOrder.addOrderProduct(orderProduct); // Orders 객체에 OrderProduct 추가
+        }
 
-            // Orders 객체에도 추가하여 양방향 관계 유지
-            savedOrder.addOrderProduct(orderProduct);
-        });
+        // 총 가격, 총 할인 금액 및 총 세액 설정
+        order.setTotalAmount(totalAmount.intValue());
+        order.setDiscountAmount(totalDiscountAmount.intValue());
+        order.setTaxAmount(totalTaxAmount.intValue());
 
-        // 전체 Orders와 연관된 OrderProducts 저장
         Orders finalSavedOrder = ordersRepository.save(savedOrder);
         return new OrderResponse(finalSavedOrder);
     }
+
 
     // 주문 조회
     @Transactional(readOnly = true)
@@ -81,7 +103,6 @@ public class OrderService {
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
         return new OrderResponse(order);
     }
-
     // 전체 주문 조회 (페이징 적용)
     @Transactional(readOnly = true)
     public Page<OrderResponse> getAllOrders(int page, int size) {
@@ -99,36 +120,58 @@ public class OrderService {
 
         // 기본 주문 정보 업데이트
         order.setOrderDate(orderDTO.getOrderDate());
-        order.setDiscountAmount(orderDTO.getDiscountAmount());
-        order.setTaxAmount(orderDTO.getTaxAmount());
         order.setOrderNote(orderDTO.getOrderNote());
         order.setShippingAddr(orderDTO.getShippingAddr());
         order.setShippingSdate(orderDTO.getShippingSdate());
 
-        // 주문에 포함된 OrderProduct 리스트 업데이트
-        order.getOrderProducts().clear(); // 기존 OrderProduct 리스트 초기화
+        // 기존 OrderProduct 리스트 초기화
+        order.getOrderProducts().clear();
 
-        orderDTO.getProducts().forEach(productDTO -> {
+        BigDecimal totalAmount = BigDecimal.ZERO;         // 총 가격
+        BigDecimal totalDiscountAmount = BigDecimal.ZERO; // 총 할인 금액
+        BigDecimal totalTaxAmount = BigDecimal.ZERO;      // 총 세액
+
+        // 각 제품에 대해 OrderProduct 생성 및 할인/세액 계산
+        for (OrderRequest.OrderProductDTO productDTO : orderDTO.getProducts()) {
             Product product = productRepository.findById(productDTO.getProductId())
                     .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+
+            BigDecimal originalPrice = BigDecimal.valueOf(product.getProductPrice());
+            BigDecimal discountAmount = originalPrice.multiply(productDTO.getDiscount().divide(BigDecimal.valueOf(100)));
+            BigDecimal finalPrice = originalPrice.subtract(discountAmount); // 할인 적용된 가격
+
+            // 제품의 총 가격(total) 계산 (세금 포함)
+            BigDecimal quantity = BigDecimal.valueOf(productDTO.getQuantity());
+            BigDecimal tax = finalPrice.multiply(quantity).multiply(BigDecimal.valueOf(0.1)); // 총 가격의 10%를 세액으로 계산
+            BigDecimal total = finalPrice.multiply(quantity).add(tax); // 세금 포함한 최종 금액
+
+            totalAmount = totalAmount.add(total); // 전체 주문 금액 누적
+            totalDiscountAmount = totalDiscountAmount.add(discountAmount.multiply(quantity)); // 전체 주문 할인 누적
+            totalTaxAmount = totalTaxAmount.add(tax); // 총 세액 누적
 
             OrderProduct orderProduct = OrderProduct.builder()
                     .product(product)
                     .quantity(productDTO.getQuantity())
-                   // .price(product.getPrice()) // Product의 가격을 가져와서 설정
-                    .discount(productDTO.getDiscount())
-                    .tax(productDTO.getTax())
-                  //  .subtotal(product.getPrice().multiply(BigDecimal.valueOf(productDTO.getQuantity())))
+                    .price(finalPrice)            // 할인 적용된 가격 설정
+                    .discount(discountAmount)     // 개별 할인 금액
+                    .tax(tax)                     // 개별 세액 설정
+                    .total(total)              // 세금 포함 최종 금액 저장 (total로 변경 가능)
                     .order(order)
                     .build();
 
             orderProductRepository.save(orderProduct); // OrderProduct 저장
             order.addOrderProduct(orderProduct); // Orders 객체에 OrderProduct 추가
-        });
+        }
+
+        // 총 가격, 총 할인 금액 및 총 세액 설정
+        order.setTotalAmount(totalAmount.intValue());
+        order.setDiscountAmount(totalDiscountAmount.intValue());
+        order.setTaxAmount(totalTaxAmount.intValue());
 
         Orders updatedOrder = ordersRepository.save(order); // 변경된 Orders 저장
         return new OrderResponse(updatedOrder);
     }
+
 
     // 주문 삭제
     @Transactional
