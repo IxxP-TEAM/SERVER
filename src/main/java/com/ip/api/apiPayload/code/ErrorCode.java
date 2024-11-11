@@ -21,6 +21,9 @@ public enum ErrorCode {
     CODE_NOT_FOUND(HttpStatus.NOT_FOUND, "USER-007", "인증 코드가 존재하지 않습니다."),
     CODE_EXPIRATION_TIME(HttpStatus.ACCEPTED, "USER-008", "인증 코드 유효 시간이 만료 되었습니다."),
 
+    // leave
+    LEAVE_NOT_FOUND(HttpStatus.NOT_FOUND, "LEAVE-001", "존재하지 않는 휴가입니다."),
+
     //product
     PRODUCT_NAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "PRODUCT-001", "이미 존재하는 제품입니다."),
 
