@@ -4,7 +4,7 @@ import com.ip.api.apiPayload.code.ErrorCode;
 import com.ip.api.apiPayload.exception.NotFoundException;
 import com.ip.api.domain.Attendence;
 import com.ip.api.domain.User;
-import com.ip.api.domain.enums.Status;
+import com.ip.api.domain.enums.AttendanceStatus;
 import com.ip.api.dto.user.UserResponse.AttendanceStatusDTO;
 import com.ip.api.dto.user.UserResponse.ListForPaging;
 import com.ip.api.dto.user.UserResponse.MonthlyAttendanceStatusDTO;
@@ -49,7 +49,7 @@ public class AttendanceService {
         Attendence attendence = Attendence.builder()
                 .user(user)
                 .checkInTime(LocalDateTime.now())
-                .attStatus(Status.ACTIVE)
+                .attStatus(AttendanceStatus.ACTIVE)
                 .checkOutTime(null)
                 .lateFlag(isLate)
                 .earlyLeaveFlag(false)
@@ -76,7 +76,7 @@ public class AttendanceService {
                 .attId(attendence.get().getAttId())
                 .user(user)
                 .checkInTime(LocalDateTime.now())
-                .attStatus(Status.INACTIVE)
+                .attStatus(AttendanceStatus.INACTIVE)
                 .checkOutTime(LocalDateTime.now())
                 .lateFlag(attendence.get().isLateFlag())
                 .earlyLeaveFlag(isEarlyLeave)

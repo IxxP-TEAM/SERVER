@@ -1,8 +1,8 @@
 package com.ip.api.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.ip.api.domain.enums.AttendanceStatus;
 import com.ip.api.domain.enums.Department;
-import com.ip.api.domain.enums.Status;
 import com.ip.api.domain.enums.UserStatus;
 import java.time.LocalDate;
 import java.util.List;
@@ -64,7 +64,7 @@ public class UserResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class AttendanceStatusDTO {
-        private Status status;
+        private AttendanceStatus status;
     }
 
 

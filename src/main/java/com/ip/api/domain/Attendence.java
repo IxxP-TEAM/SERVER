@@ -1,7 +1,7 @@
 package com.ip.api.domain;
 
 import com.ip.api.domain.common.BaseEntity;
-import com.ip.api.domain.enums.Status;
+import com.ip.api.domain.enums.AttendanceStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -28,7 +28,7 @@ public class Attendence extends BaseEntity {
     private LocalDateTime checkInTime;
     private LocalDateTime checkOutTime;
     @Enumerated(EnumType.STRING)
-    private Status attStatus;
+    private AttendanceStatus attStatus;
     private boolean lateFlag;   // 지각여부
     private boolean earlyLeaveFlag; // 조퇴여부
     @ManyToOne
