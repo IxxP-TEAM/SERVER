@@ -19,6 +19,7 @@ public class ProductRequestDto {
 	private ProductType productType;
 	@Min(value = 0, message = "임계재고는 0 이상이어야 합니다.")
 	private int safetyStockQuantity;
+	private int productPrice;
 	
 	
 	public Product toEntity() {
@@ -26,6 +27,7 @@ public class ProductRequestDto {
 				.productName(this.productName)
 				.productType(this.productType)
 				.safetyStockQuantity(this.safetyStockQuantity)
+				.productPrice(this.productPrice)
 				.build();
 	}
 }

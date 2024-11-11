@@ -1,11 +1,7 @@
 package com.ip.api.service;
 
-import java.util.Optional;
-
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.ip.api.apiPayload.code.ErrorCode;
@@ -52,7 +48,8 @@ public class ProductService {
 	    product.updateProduct(
 	        productRequestDto.getProductName(),
 	        productRequestDto.getProductType(),
-	        productRequestDto.getSafetyStockQuantity()
+	        productRequestDto.getSafetyStockQuantity(),
+	        productRequestDto.getProductPrice()
 	    );
 	    
 	    Product updatedProduct = productRepository.save(product);

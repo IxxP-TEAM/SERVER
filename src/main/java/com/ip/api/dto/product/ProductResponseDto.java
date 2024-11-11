@@ -18,6 +18,7 @@ public class ProductResponseDto {
 	 private String productName;
 	 private ProductType productType;
 	 private int safetyStockQuantity;
+	 private int productPrice;
 	 
 	 public static ProductResponseDto fromEntity(Product product) {
 		 
@@ -26,6 +27,7 @@ public class ProductResponseDto {
 				 .productName(product.getProductName())
 				 .productType(product.getProductType())
 				 .safetyStockQuantity(product.getSafetyStockQuantity())
+				 .productPrice(product.getProductPrice())
 				 .build();
 	 }
 }
