@@ -3,6 +3,8 @@ package com.ip.api.domain;
 import com.ip.api.domain.common.BaseEntity;
 import com.ip.api.domain.enums.Status;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,6 +27,7 @@ public class Attendence extends BaseEntity {
     private Long attId;
     private LocalDateTime checkInTime;
     private LocalDateTime checkOutTime;
+    @Enumerated(EnumType.STRING)
     private Status attStatus;
     private boolean lateFlag;   // 지각여부
     private boolean earlyLeaveFlag; // 조퇴여부

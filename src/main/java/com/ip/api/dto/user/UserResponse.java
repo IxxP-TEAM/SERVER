@@ -2,6 +2,7 @@ package com.ip.api.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ip.api.domain.enums.Department;
+import com.ip.api.domain.enums.Status;
 import com.ip.api.domain.enums.UserStatus;
 import java.time.LocalDate;
 import java.util.List;
@@ -56,5 +57,13 @@ public class UserResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class EmailCodeDTO {
         private String code;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CheckInStatusDTO {
+        private Status status;
     }
 }
