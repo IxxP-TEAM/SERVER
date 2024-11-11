@@ -26,7 +26,7 @@ public class InventoryHistoryResponseDto {
 	    private String adjustment;  
 	    private Long userId;  
 	    
-	    public static InventoryHistoryResponseDto of(InventoryHistory inventoryHistory) {
+	    public static InventoryHistoryResponseDto fromEntity(InventoryHistory inventoryHistory) {
 	        return InventoryHistoryResponseDto.builder()
 	            .historyId(inventoryHistory.getHistoryId())
 	            .productId(inventoryHistory.getProduct().getProductId())
