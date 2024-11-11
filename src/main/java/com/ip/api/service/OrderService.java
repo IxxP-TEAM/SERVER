@@ -1,22 +1,19 @@
 package com.ip.api.service;
 
-import com.ip.api.domain.Customer;
-import com.ip.api.domain.Orders;
-import com.ip.api.domain.User;
+import com.ip.api.domain.*;
 import com.ip.api.dto.order.OrderRequest;
 import com.ip.api.dto.order.OrderResponse;
-import com.ip.api.repository.CustomerRepository;
-import com.ip.api.repository.OrdersRepository;
-import com.ip.api.repository.UserRepository;
+import com.ip.api.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,69 +28,115 @@ public class OrderService {
     @Autowired
     private CustomerRepository customerRepository;
 
-    // 주문 생성 메서드
-    public OrderResponse createOrder(User user, OrderRequest.OrderDTO orderDTO) {
-        // DTO를 Orders 엔티티로 변환
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private OrderProductRepository orderProductRepository;
+
+    // 주문 생성 (여러 제품 추가)
+    @Transactional
+    public OrderResponse createOrderWithProducts(OrderRequest.OrderDTO orderDTO) {
         Orders order = orderDTO.toEntity();
-        // Customer를 데이터베이스에서 조회하고, 없을 시 예외 처리
+
+        User user = userRepository.findById(orderDTO.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
         Customer customer = customerRepository.findById(orderDTO.getCustomerId())
                 .orElseThrow(() -> new EntityNotFoundException("Customer not found"));
-        // Orders 엔티티에 user와 customer 설정
         order.setUser(user);
         order.setCustomer(customer);
-        // 저장 후, 저장된 Orders 엔티티를 OrderResponse로 반환
+
         Orders savedOrder = ordersRepository.save(order);
-        return new OrderResponse(savedOrder);
+
+        orderDTO.getProducts().forEach(productDTO -> {
+            Product product = productRepository.findById(productDTO.getProductId())
+                    .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+
+            OrderProduct orderProduct = OrderProduct.builder()
+                    .product(product)
+                    .quantity(productDTO.getQuantity())
+                   // .price(productDTO.getPrice())
+                    .discount(productDTO.getDiscount())
+                    .tax(productDTO.getTax())
+                  //  .subtotal(productDTO.getPrice().multiply(BigDecimal.valueOf(productDTO.getQuantity())))
+                    .order(savedOrder)
+                    .build();
+
+            // OrderProduct를 명시적으로 저장
+            orderProductRepository.save(orderProduct);
+
+            // Orders 객체에도 추가하여 양방향 관계 유지
+            savedOrder.addOrderProduct(orderProduct);
+        });
+
+        // 전체 Orders와 연관된 OrderProducts 저장
+        Orders finalSavedOrder = ordersRepository.save(savedOrder);
+        return new OrderResponse(finalSavedOrder);
     }
 
-    // 주문 ID로 조회 메서드
+    // 주문 조회
+    @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long orderId) {
-        Orders order = ordersRepository.findById(orderId)
+        Orders order = ordersRepository.findByIdWithProducts(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
-        return new OrderResponse(order); // 주문을 응답 객체로 반환
+        return new OrderResponse(order);
     }
 
-    // 모든 주문 조회 메서드 (페이징 적용)
+    // 전체 주문 조회 (페이징 적용)
+    @Transactional(readOnly = true)
     public Page<OrderResponse> getAllOrders(int page, int size) {
-        // PageRequest 객체 생성: 페이지 번호와 페이지 크기를 설정합니다.
         Pageable pageable = PageRequest.of(page, size);
-
-        // 페이징된 결과를 OrdersRepository에서 가져옵니다.
         Page<Orders> ordersPage = ordersRepository.findAll(pageable);
 
-        // Orders 객체를 OrderResponse 객체로 매핑하여 반환합니다.
+        // Orders -> OrderResponse로 변환
         return ordersPage.map(OrderResponse::new);
     }
-
-    // 주문 수정 메서드
-    public OrderResponse updateOrder(Long orderId, User user, OrderRequest.OrderDTO requestDTO) {
-        Orders order = ordersRepository.findById(orderId)
+    // 주문 수정
+    @Transactional
+    public OrderResponse updateOrder(Long orderId, OrderRequest.OrderDTO orderDTO) {
+        Orders order = ordersRepository.findByIdWithProducts(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
 
-        // 필요한 필드만 업데이트 (null 또는 기본값이 아닌 경우)
-        if (requestDTO.getOrderDate() != null) order.setOrderDate(requestDTO.getOrderDate());
-        if (requestDTO.getOrderStatus() != null) order.setOrderStatus(requestDTO.getOrderStatus());
-        if (requestDTO.getTotalAmount() != 0) order.setTotalAmount(requestDTO.getTotalAmount());
-        if (requestDTO.getPaymentMethod() != null) order.setPaymentMethod(requestDTO.getPaymentMethod());
-        if (requestDTO.getPaymentStatus() != null) order.setPaymentStatus(requestDTO.getPaymentStatus());
-        if (requestDTO.getShippingAddr() != null) order.setShippingAddr(requestDTO.getShippingAddr());
-        if (requestDTO.getShippingSdate() != null) order.setShippingSdate(requestDTO.getShippingSdate());
-        if (requestDTO.getShippingStatus() != null) order.setShippingStatus(requestDTO.getShippingStatus());
-        if (requestDTO.getDiscountAmount() != 0) order.setDiscountAmount(requestDTO.getDiscountAmount());
-        if (requestDTO.getTaxAmount() != 0) order.setTaxAmount(requestDTO.getTaxAmount());
-        if (requestDTO.getOrderNote() != null) order.setOrderNote(requestDTO.getOrderNote());
+        // 기본 주문 정보 업데이트
+        order.setOrderDate(orderDTO.getOrderDate());
+        order.setDiscountAmount(orderDTO.getDiscountAmount());
+        order.setTaxAmount(orderDTO.getTaxAmount());
+        order.setOrderNote(orderDTO.getOrderNote());
+        order.setShippingAddr(orderDTO.getShippingAddr());
+        order.setShippingSdate(orderDTO.getShippingSdate());
 
-        // 수정된 주문을 저장하고 응답 객체로 반환
-        Orders updatedOrder = ordersRepository.save(order);
+        // 주문에 포함된 OrderProduct 리스트 업데이트
+        order.getOrderProducts().clear(); // 기존 OrderProduct 리스트 초기화
+
+        orderDTO.getProducts().forEach(productDTO -> {
+            Product product = productRepository.findById(productDTO.getProductId())
+                    .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+
+            OrderProduct orderProduct = OrderProduct.builder()
+                    .product(product)
+                    .quantity(productDTO.getQuantity())
+                   // .price(product.getPrice()) // Product의 가격을 가져와서 설정
+                    .discount(productDTO.getDiscount())
+                    .tax(productDTO.getTax())
+                  //  .subtotal(product.getPrice().multiply(BigDecimal.valueOf(productDTO.getQuantity())))
+                    .order(order)
+                    .build();
+
+            orderProductRepository.save(orderProduct); // OrderProduct 저장
+            order.addOrderProduct(orderProduct); // Orders 객체에 OrderProduct 추가
+        });
+
+        Orders updatedOrder = ordersRepository.save(order); // 변경된 Orders 저장
         return new OrderResponse(updatedOrder);
     }
 
-    // 주문 삭제 메서드
+    // 주문 삭제
+    @Transactional
     public boolean deleteOrder(Long orderId) {
         if (ordersRepository.existsById(orderId)) {
             ordersRepository.deleteById(orderId);
-            return true; // 삭제 성공 시 true 반환
+            return true;
         }
-        return false; // 주문이 존재하지 않을 경우 false 반환
+        return false;
     }
 }
