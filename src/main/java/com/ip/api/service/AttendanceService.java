@@ -5,8 +5,10 @@ import com.ip.api.domain.User;
 import com.ip.api.domain.enums.Status;
 import com.ip.api.dto.user.UserResponse.AttendanceStatusDTO;
 import com.ip.api.repository.AttendanceRepository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +45,33 @@ public class AttendanceService {
         attendanceRepository.save(attendence);
         return AttendanceStatusDTO.builder()
                 .status(attendence.getAttStatus())
+                .build();
+    }
+
+    public AttendanceStatusDTO checkOut(User user) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+        Optional<Attendence> attendence = attendanceRepository.findByUserAndCheckInTimeBetween(user, startOfDay, endOfDay);
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        LocalTime standardLeave = LocalTime.of(18, 0);
+        boolean isEarlyLeave = currentDateTime.toLocalTime().isBefore(standardLeave);
+
+        Attendence leaveWork = Attendence.builder()
+                .attId(attendence.get().getAttId())
+                .user(user)
+                .checkInTime(LocalDateTime.now())
+                .attStatus(Status.INACTIVE)
+                .checkOutTime(LocalDateTime.now())
+                .lateFlag(attendence.get().isLateFlag())
+                .earlyLeaveFlag(isEarlyLeave)
+                .build();
+
+        attendanceRepository.save(leaveWork);
+
+        return AttendanceStatusDTO.builder()
+                .status(leaveWork.getAttStatus())
                 .build();
     }
 }

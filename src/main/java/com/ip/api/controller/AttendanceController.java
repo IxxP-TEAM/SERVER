@@ -29,4 +29,10 @@ public class AttendanceController {
         return ApiResponse.of(response);
     }
 
+    // 퇴근하기
+    @PostMapping("/leave-work")
+    public ApiResponse<AttendanceStatusDTO> checkOut(@AuthUser User user) {
+        AttendanceStatusDTO response = attendanceService.checkOut(user);
+        return ApiResponse.of(response);
+    }
 }
