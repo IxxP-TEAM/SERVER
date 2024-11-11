@@ -8,6 +8,8 @@ import com.ip.api.dto.customer.CustomerRequest.CustomerDTO;
 import com.ip.api.dto.customer.CustomerResponse;
 import com.ip.api.service.CustomerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -30,9 +32,8 @@ public class CustomerController {
 
     //모든 고객사 조회
     @GetMapping("/all")
-    public ApiResponse<List<CustomerResponse>> getAllCustomers(){
-        List<CustomerResponse> response = customerService.getAllCustomers();
-        return ApiResponse.of(response);
+    public Page<CustomerResponse> getAllCustomers(Pageable pageable) {
+        return customerService.getAllCustomers(pageable);
     }
 
     //특정 고객사 조회
@@ -44,9 +45,10 @@ public class CustomerController {
 
     //이름으로 고객사 조회
     @GetMapping("/search")
-    public ApiResponse<List<CustomerResponse>> searchCustomerByName(@RequestParam String name){
-        List<CustomerResponse> response = customerService.searchCustomersByName(name);
-        return ApiResponse.of(response);
+    public Page<CustomerResponse> searchCustomersByName(
+            @RequestParam String customerName,
+            Pageable pageable) {
+        return customerService.searchCustomersByName(customerName, pageable);
     }
 
 

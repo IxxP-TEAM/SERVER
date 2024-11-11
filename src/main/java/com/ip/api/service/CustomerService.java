@@ -6,6 +6,8 @@ import com.ip.api.dto.customer.CustomerRequest.CustomerDTO;
 import com.ip.api.dto.customer.CustomerResponse;
 import com.ip.api.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,10 +42,9 @@ public class CustomerService {
         return convertToDTO(savedCustomer);
     }
 
-    public List<CustomerResponse> getAllCustomers() {
-        return customerRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+    public Page<CustomerResponse> getAllCustomers(Pageable pageable) {
+        return customerRepository.findAll(pageable)
+                .map(this::convertToDTO);
     }
 
     public CustomerResponse getCustomerById(Long id) {
@@ -79,11 +80,11 @@ public class CustomerService {
         );
     }
 
-    public List<CustomerResponse> searchCustomersByName(String customerName) {
-        return customerRepository.findByCustomerNameContaining(customerName).stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+    public Page<CustomerResponse> searchCustomersByName(String customerName, Pageable pageable) {
+        return customerRepository.findByCustomerNameContaining(customerName, pageable)
+                .map(this::convertToDTO);
     }
+
 
     public boolean deleteCustomerById(Long id) {
         if (customerRepository.existsById(id)) {
