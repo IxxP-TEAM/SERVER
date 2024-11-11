@@ -3,7 +3,7 @@ package com.ip.api.service;
 import com.ip.api.domain.Attendence;
 import com.ip.api.domain.User;
 import com.ip.api.domain.enums.Status;
-import com.ip.api.dto.user.UserResponse.CheckInStatusDTO;
+import com.ip.api.dto.user.UserResponse.AttendanceStatusDTO;
 import com.ip.api.repository.AttendanceRepository;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -15,18 +15,18 @@ import org.springframework.stereotype.Service;
 public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
 
-    public CheckInStatusDTO checkInStatus(User user) {
+    public AttendanceStatusDTO checkInStatus(User user) {
         Attendence attendence = attendanceRepository.findByUser(user);
 
         boolean isCheckIn = attendence != null;
         System.out.println(isCheckIn);
 
-        return CheckInStatusDTO.builder()
+        return AttendanceStatusDTO.builder()
                 .status(attendence.getAttStatus())
                 .build();
     }
 
-    public CheckInStatusDTO checkIn(User user) {
+    public AttendanceStatusDTO checkIn(User user) {
         LocalDateTime currentDateTime = LocalDateTime.now();
         LocalTime lateTime = LocalTime.of(9, 0);
         boolean isLate = currentDateTime.toLocalTime().isAfter(lateTime);
@@ -41,7 +41,7 @@ public class AttendanceService {
                 .build();
 
         attendanceRepository.save(attendence);
-        return CheckInStatusDTO.builder()
+        return AttendanceStatusDTO.builder()
                 .status(attendence.getAttStatus())
                 .build();
     }

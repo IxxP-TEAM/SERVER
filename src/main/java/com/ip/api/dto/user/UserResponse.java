@@ -63,7 +63,7 @@ public class UserResponse {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CheckInStatusDTO {
+    public static class AttendanceStatusDTO {
         private Status status;
     }
 }
