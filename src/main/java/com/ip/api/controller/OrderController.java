@@ -10,55 +10,56 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
 
     @Autowired
-    private OrderService ordersService;
+    private OrderService orderService;
 
-    //주문 생성
+    // 주문 생성 (여러 제품 포함)
     @PostMapping("/create")
-    public ApiResponse<OrderResponse> createOrder(@AuthUser User user, @RequestBody OrderDTO request){
-        OrderResponse response = ordersService.createOrder(user,request);
+    public ApiResponse<OrderResponse> createOrderWithProducts(@AuthUser User user, @RequestBody OrderDTO request) {
+        OrderResponse response = orderService.createOrderWithProducts(request);
         return ApiResponse.of(response);
     }
 
-    //전체 주문 조회
+    // 전체 주문 조회 (페이징 적용)
     @GetMapping("/all")
     public ApiResponse<Page<OrderResponse>> getAllOrders(
-            @RequestParam(defaultValue = "0") int page,  // 기본값으로 페이지 0 설정
-            @RequestParam(defaultValue = "10") int size  // 기본값으로 10개의 항목 설정
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
-        // OrderService에서 페이징 처리된 결과를 받습니다.
-        Page<OrderResponse> response = ordersService.getAllOrders(page, size);
+        Page<OrderResponse> response = orderService.getAllOrders(page, size);
         return ApiResponse.of(response);
     }
 
-    //특정 주문 조회
+    // 특정 주문 조회
     @GetMapping("/{id}")
-    public ApiResponse<OrderResponse> getOrderById(@PathVariable Long id){
-        OrderResponse response = ordersService.getOrderById(id);
+    public ApiResponse<OrderResponse> getOrderById(@PathVariable Long id) {
+        OrderResponse response = orderService.getOrderById(id);
         return ApiResponse.of(response);
     }
 
-    //주문 수정
+    // 주문 수정
     @PatchMapping("/{id}")
-    public ApiResponse<OrderResponse> updateOrder(@PathVariable Long id,@AuthUser User user, @RequestBody OrderDTO request){
-
-        OrderResponse updatedOrder = ordersService.updateOrder(id,user,request);
+    public ApiResponse<OrderResponse> updateOrder(
+            @PathVariable Long id,
+            @AuthUser User user,
+            @RequestBody OrderDTO request
+    ) {
+        OrderResponse updatedOrder = orderService.updateOrder(id, request);
         return ApiResponse.of(updatedOrder);
     }
 
-    //주문 삭제
+    // 주문 삭제
     @DeleteMapping("/{id}")
-    public ApiResponse<String> deleteOrderById(@PathVariable Long id){
-        boolean isDeleted = ordersService.deleteOrder(id);
-        if(isDeleted){
-            return ApiResponse.of("고객사가 성공적으로 삭제되었습니다.");
+    public ApiResponse<String> deleteOrderById(@PathVariable Long id) {
+        boolean isDeleted = orderService.deleteOrder(id);
+        if (isDeleted) {
+            return ApiResponse.of("주문이 성공적으로 삭제되었습니다.");
+        } else {
+            return ApiResponse.of("주문 삭제에 실패했습니다.");
         }
-        else{return null;}
     }
 }

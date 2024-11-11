@@ -9,14 +9,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public class OrderRequest {
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class OrderDTO { // Corrected: Changed "void" to "class"
+    public static class OrderDTO {
         private LocalDate orderDate;
         private OrderStatus orderStatus;
         private int totalAmount;
@@ -30,6 +32,7 @@ public class OrderRequest {
         private String orderNote;
         private Long userId; // User ID reference
         private Long customerId; // Customer ID reference
+        private List<OrderProductDTO> products; // OrderProduct list
 
         // Converts the DTO to an Orders entity.
         // Note: This method does not set user or customer, which should be set in the Service layer.
@@ -48,5 +51,17 @@ public class OrderRequest {
                     .orderNote(orderNote)
                     .build();
         }
+    }
+
+    // OrderProductDTO for product details in each order
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class OrderProductDTO {
+        private Long productId;
+        private Long quantity;
+        //private BigDecimal price;
+        private BigDecimal discount;
+        private BigDecimal tax;
     }
 }
