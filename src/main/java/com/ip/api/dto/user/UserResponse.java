@@ -66,4 +66,21 @@ public class UserResponse {
     public static class AttendanceStatusDTO {
         private Status status;
     }
+
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MonthlyAttendanceStatusDTO {
+        private long userId;
+        private String username;
+        private String jobTitle;
+        private Department department;
+        private String workDate; // 근무일
+        private String checkIn;  // 출근시간
+        private String checkOut; // 퇴근시간
+        private String workTime; //근무시간
+        private boolean lateFlag;   //지각여부
+    }
 }
