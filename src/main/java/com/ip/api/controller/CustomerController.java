@@ -83,4 +83,14 @@ public class CustomerController {
         return ApiResponse.of(response); // 응답에 response 객체를 직접 전달
     }
 
+    // 다수의 고객 ID에 대해 이름을 반환하는 엔드포인트
+    @PostMapping("/names")
+    public ApiResponse<List<CustomerResponse>> getCustomerNames(@RequestBody Map<String, List<Long>> customerIdsMap) {
+        List<Long> customerIds = customerIdsMap.get("customerIds");
+        List<CustomerResponse> customers = customerService.getCustomerNamesByIds(customerIds);
+        return ApiResponse.of(customers);
+    }
+
+
+
 }
