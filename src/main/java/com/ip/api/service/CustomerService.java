@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -93,6 +94,13 @@ public class CustomerService {
         } else {
             return false;
         }
+    }
+
+    public List<CustomerResponse> getCustomerNamesByIds(List<Long> customerIds) {
+        List<Customer> customers = customerRepository.findAllById(customerIds);
+        return customers.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     public CustomerResponse updateCustomer(Long id, User user, CustomerDTO customerRequest) {
