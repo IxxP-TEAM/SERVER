@@ -135,12 +135,20 @@ public class OrderService {
             BigDecimal originalPrice = BigDecimal.valueOf(product.getProductPrice());
             BigDecimal quantity = BigDecimal.valueOf(productDTO.getQuantity());
 
-            BigDecimal tax = originalPrice.multiply(quantity).multiply(BigDecimal.valueOf(0.1));
-            BigDecimal priceWithTax = originalPrice.multiply(quantity).add(tax);
+            // 1. 개별 상품의 총 금액 계산 (단가 * 수량)
+            BigDecimal productTotal = originalPrice.multiply(quantity);
 
+            // 2. 개별 상품의 부가세 계산 (총 금액 * 0.1)
+            BigDecimal tax = productTotal.multiply(BigDecimal.valueOf(0.1));
+
+            // 3. 부가세 포함 금액
+            BigDecimal priceWithTax = productTotal.add(tax);
+
+            // 4. 할인 적용 (부가세 포함 금액 * 할인율)
             BigDecimal discountAmount = priceWithTax.multiply(productDTO.getDiscount().divide(BigDecimal.valueOf(100)));
             BigDecimal finalPrice = priceWithTax.subtract(discountAmount);
 
+            // 5. 최종 금액을 전체 금액에 합산
             totalAmount = totalAmount.add(finalPrice);
             totalDiscountAmount = totalDiscountAmount.add(discountAmount);
             totalTaxAmount = totalTaxAmount.add(tax);
@@ -162,6 +170,7 @@ public class OrderService {
         order.setTotalAmount(totalAmount.intValue());
         order.setDiscountAmount(totalDiscountAmount.intValue());
         order.setTaxAmount(totalTaxAmount.intValue());
+
 
         Orders updatedOrder = ordersRepository.save(order);
         return new OrderResponse(updatedOrder);
