@@ -17,9 +17,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class InventoryHistoryRequestDTO {
+public class InventoryHistoryRequestDto {
 	
-	private Long productId;
+	private String productName;
 	private ChangeType changeType;
 	private int quantity;
 	private LocalDate expirationDate;
@@ -41,7 +41,7 @@ public class InventoryHistoryRequestDTO {
 	public Inventory toInventoryEntity(Product product) {
         return Inventory.builder()
                 .product(product)
-                .currentQuantity(this.quantity) // 입고된 수량을 현재 수량으로 설정
+                .currentQuantity(this.quantity) 
                 .expirationDate(this.expirationDate)
                 .build();
     }

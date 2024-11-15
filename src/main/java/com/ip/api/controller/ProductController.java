@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("api/products")
 @RequiredArgsConstructor
-@CrossOrigin
 public class ProductController {
 
 	private final ProductService productService;
