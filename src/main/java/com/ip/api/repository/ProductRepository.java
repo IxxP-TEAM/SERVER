@@ -1,10 +1,13 @@
 package com.ip.api.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ip.api.domain.Product;
+import com.ip.api.domain.User;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 	
@@ -15,5 +18,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByProductNameAndProductIdNot(String productName, Long id);
 	
 	Page<Product> findByProductNameContaining(String productName, Pageable pageable);
+
+	Optional<Product> findByProductName(String productName);
 	
 }
