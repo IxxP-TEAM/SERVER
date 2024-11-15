@@ -67,6 +67,14 @@ public class UserResponse {
         private AttendanceStatus status;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AttendanceDTO {
+        private boolean status;
+    }
+
 
     @Builder
     @Getter
