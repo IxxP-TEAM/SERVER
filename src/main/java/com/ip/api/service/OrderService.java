@@ -1,6 +1,7 @@
 package com.ip.api.service;
 
 import com.ip.api.domain.*;
+import com.ip.api.domain.enums.OrderStatus;
 import com.ip.api.dto.order.OrderRequest;
 import com.ip.api.dto.order.OrderResponse;
 import com.ip.api.repository.*;
@@ -34,6 +35,9 @@ public class OrderService {
     @Autowired
     private OrderProductRepository orderProductRepository;
 
+    @Autowired
+    private SalesHistoryRepository salesHistoryRepository;
+
     // 주문 생성 (여러 제품 추가)
     @Transactional
     public OrderResponse createOrderWithProducts(OrderRequest.OrderDTO orderDTO) {
@@ -59,11 +63,9 @@ public class OrderService {
             BigDecimal originalPrice = BigDecimal.valueOf(product.getProductPrice());
             BigDecimal quantity = BigDecimal.valueOf(productDTO.getQuantity());
 
-            // 1. 부가세 적용된 금액 계산
             BigDecimal tax = originalPrice.multiply(quantity).multiply(BigDecimal.valueOf(0.1));
             BigDecimal priceWithTax = originalPrice.multiply(quantity).add(tax);
 
-            // 2. 부가세 적용된 금액에 대한 할인 금액 계산 및 최종 가격 설정
             BigDecimal discountAmount = priceWithTax.multiply(productDTO.getDiscount().divide(BigDecimal.valueOf(100)));
             BigDecimal finalPrice = priceWithTax.subtract(discountAmount);
 
@@ -90,9 +92,21 @@ public class OrderService {
         order.setTaxAmount(totalTaxAmount.intValue());
 
         Orders finalSavedOrder = ordersRepository.save(savedOrder);
+
+        if (order.getOrderStatus() == OrderStatus.완료) {
+            SalesHistory salesHistory = SalesHistory.builder()
+                    .salesAmount(BigDecimal.valueOf(order.getTotalAmount()))
+                    .salesDate(order.getOrderDate())
+                    .user(order.getUser())
+                    .customer(order.getCustomer())
+                    .order(finalSavedOrder)
+                    .build();
+
+            salesHistoryRepository.save(salesHistory);
+        }
+
         return new OrderResponse(finalSavedOrder);
     }
-
 
 
     // 주문 조회
@@ -117,10 +131,19 @@ public class OrderService {
         Orders order = ordersRepository.findByIdWithProducts(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
 
+        // 주문 정보 업데이트
         order.setOrderDate(orderDTO.getOrderDate());
-        order.setOrderNote(orderDTO.getOrderNote());
+        order.setOrderStatus(orderDTO.getOrderStatus());
+        order.setTotalAmount(orderDTO.getTotalAmount());
+        order.setPaymentMethod(orderDTO.getPaymentMethod());
+        order.setPaymentStatus(orderDTO.getPaymentStatus());
         order.setShippingAddr(orderDTO.getShippingAddr());
         order.setShippingSdate(orderDTO.getShippingSdate());
+        order.setShippingStatus(orderDTO.getShippingStatus());
+        order.setDiscountAmount(orderDTO.getDiscountAmount());
+        order.setTaxAmount(orderDTO.getTaxAmount());
+        order.setOrderNote(orderDTO.getOrderNote());
+
 
         order.getOrderProducts().clear();
 
@@ -135,9 +158,9 @@ public class OrderService {
             BigDecimal originalPrice = BigDecimal.valueOf(product.getProductPrice());
             BigDecimal quantity = BigDecimal.valueOf(productDTO.getQuantity());
 
-            BigDecimal tax = originalPrice.multiply(quantity).multiply(BigDecimal.valueOf(0.1));
-            BigDecimal priceWithTax = originalPrice.multiply(quantity).add(tax);
-
+            BigDecimal productTotal = originalPrice.multiply(quantity);
+            BigDecimal tax = productTotal.multiply(BigDecimal.valueOf(0.1));
+            BigDecimal priceWithTax = productTotal.add(tax);
             BigDecimal discountAmount = priceWithTax.multiply(productDTO.getDiscount().divide(BigDecimal.valueOf(100)));
             BigDecimal finalPrice = priceWithTax.subtract(discountAmount);
 
@@ -164,6 +187,26 @@ public class OrderService {
         order.setTaxAmount(totalTaxAmount.intValue());
 
         Orders updatedOrder = ordersRepository.save(order);
+
+        // **SalesHistory 생성 또는 업데이트 로직**
+        if (order.getOrderStatus() == OrderStatus.완료) {
+            // 주문이 완료 상태일 때 SalesHistory 조회 후 없으면 생성
+            SalesHistory salesHistory = salesHistoryRepository.findByOrderOrderId(orderId)
+                    .orElse(SalesHistory.builder()
+                            .order(updatedOrder)
+                            .user(order.getUser())
+                            .customer(order.getCustomer())
+                            .build());
+
+            // SalesHistory 데이터 업데이트
+            salesHistory.setSalesAmount(BigDecimal.valueOf(order.getTotalAmount()));
+            salesHistory.setSalesDate(order.getOrderDate());
+            salesHistoryRepository.save(salesHistory);
+        } else {
+            // 주문이 완료 상태가 아닐 때 SalesHistory 삭제
+            salesHistoryRepository.deleteByOrderOrderId(orderId);
+        }
+
         return new OrderResponse(updatedOrder);
     }
 
