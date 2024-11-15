@@ -38,4 +38,5 @@ public class Leaves extends BaseEntity {
     // 휴가 종류
     @Enumerated(EnumType.STRING)
     private LeaveType leaveType;
+    private String inactiveReason;
 }

@@ -1,7 +1,6 @@
 package com.ip.api.service;
 
 import com.ip.api.apiPayload.code.ErrorCode;
-import com.ip.api.apiPayload.exception.BadRequestException;
 import com.ip.api.apiPayload.exception.BusinessBaseException;
 import com.ip.api.apiPayload.exception.NotFoundException;
 import com.ip.api.domain.Attendence;
