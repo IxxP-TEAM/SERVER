@@ -1,10 +1,13 @@
 package com.ip.api.service;
 
 import com.ip.api.apiPayload.code.ErrorCode;
+import com.ip.api.apiPayload.exception.BadRequestException;
+import com.ip.api.apiPayload.exception.BusinessBaseException;
 import com.ip.api.apiPayload.exception.NotFoundException;
 import com.ip.api.domain.Attendence;
 import com.ip.api.domain.User;
 import com.ip.api.domain.enums.AttendanceStatus;
+import com.ip.api.dto.user.UserResponse.AttendanceDTO;
 import com.ip.api.dto.user.UserResponse.AttendanceStatusDTO;
 import com.ip.api.dto.user.UserResponse.ListForPaging;
 import com.ip.api.dto.user.UserResponse.MonthlyAttendanceStatusDTO;
@@ -23,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,14 +34,19 @@ public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final UserRepository userRepository;
 
-    public AttendanceStatusDTO checkInStatus(User user) {
-        Attendence attendence = attendanceRepository.findByUser(user);
+    public AttendanceDTO checkInStatus(User user) {
+        Attendence hasActiveAttendance = attendanceRepository.findByUserAndAttStatusAndCheckInTimeBetween(
+                user,
+                AttendanceStatus.ACTIVE,
+                LocalDate.now().atStartOfDay(),
+                LocalDate.now().atTime(LocalTime.MAX)
+        );
 
-        boolean isCheckIn = attendence != null;
+        boolean isCheckIn = hasActiveAttendance != null;
         System.out.println(isCheckIn);
 
-        return AttendanceStatusDTO.builder()
-                .status(attendence.getAttStatus())
+        return AttendanceDTO.builder()
+                .status(isCheckIn)
                 .build();
     }
 
@@ -45,6 +54,19 @@ public class AttendanceService {
         LocalDateTime currentDateTime = LocalDateTime.now();
         LocalTime lateTime = LocalTime.of(9, 0);
         boolean isLate = currentDateTime.toLocalTime().isAfter(lateTime);
+
+        // 오늘 날짜에 ACTIVE 상태의 출근 기록이 있는지 확인
+        boolean hasActiveAttendance = attendanceRepository.existsByUserAndAttStatusAndCheckInTimeBetween(
+                user,
+                AttendanceStatus.ACTIVE,
+                LocalDate.now().atStartOfDay(),
+                LocalDate.now().atTime(LocalTime.MAX)
+        );
+
+        if (hasActiveAttendance) {
+            throw new BusinessBaseException(ErrorCode.CHECK_IN_ALREADY);
+        }
+
 
         Attendence attendence = Attendence.builder()
                 .user(user)
@@ -61,6 +83,7 @@ public class AttendanceService {
                 .build();
     }
 
+    @Transactional
     public AttendanceStatusDTO checkOut(User user) {
         LocalDate today = LocalDate.now();
         LocalDateTime startOfDay = today.atStartOfDay();
