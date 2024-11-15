@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -34,6 +35,7 @@ public class InventoryHistory extends BaseEntity {
 	@JoinColumn(name = "user_id", referencedColumnName = "userId")
 	private User user;
 	@Column(nullable = false)
+	@Setter
 	private ChangeType changeType;
 	@Column(nullable = false)
 	private int changeQuantity;

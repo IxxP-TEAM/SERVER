@@ -11,6 +11,7 @@ import com.ip.api.domain.Product;
 import com.ip.api.dto.product.PageDto;
 import com.ip.api.dto.product.ProductRequestDto;
 import com.ip.api.dto.product.ProductResponseDto;
+import com.ip.api.repository.InventoryRepository;
 import com.ip.api.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class ProductService {
 	
 	private final ProductRepository productRepository;
+	private final InventoryRepository inventoryRepository;
 	
 	// 제품 등록
 	public ProductResponseDto createProduct(ProductRequestDto productRequestDto) {
@@ -37,13 +39,18 @@ public class ProductService {
 	public ProductResponseDto updateProduct(Long id, ProductRequestDto productRequestDto) {
 		
 		Product product = productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException());
+                .orElseThrow(() -> new BadRequestException(ErrorCode.PRODUCT_NOT_FOUND));
+		
+		// 재고에 제품이 존재하는지 확인
+        if (inventoryRepository.existsByProductProductId(id)) {
+            throw new BadRequestException(ErrorCode.PRODUCT_EXISTS_IN_INVENTORY); 
+        }
 		
 		// 동일한 이름을 가진 다른 제품이 존재하는지 확인 (현재 수정 중인 제품 제외)
         if (productRepository.existsByProductNameAndProductIdNot(productRequestDto.getProductName(), id)) {
             throw new BadRequestException(ErrorCode.PRODUCT_NAME_ALREADY_EXISTS);
         }
-		
+        
 		// 필드 업데이트
 	    product.updateProduct(
 	        productRequestDto.getProductName(),
@@ -59,6 +66,11 @@ public class ProductService {
 	
 	// 제품 삭제
 	public PageDto deleteProduct(Long id, Pageable pageable) {
+		
+		// 재고에 제품이 존재하는지 확인
+        if (inventoryRepository.existsByProductProductId(id)) {
+            throw new BadRequestException(ErrorCode.PRODUCT_EXISTS_IN_INVENTORY); 
+        }
 		
 	    productRepository.deleteById(id);
 	    Page<Product> productPage = productRepository.findAll(pageable);

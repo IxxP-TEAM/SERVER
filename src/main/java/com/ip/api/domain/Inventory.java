@@ -31,4 +31,10 @@ public class Inventory extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "productId")
     private Product product;
+    
+    // 수량 업데이트 메서드
+    public void updateQuantity(int quantityToAdd) {
+        this.currentQuantity += quantityToAdd;
+    }
+
 }
