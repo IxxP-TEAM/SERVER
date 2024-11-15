@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class LeaveService {
     private final LeaveRepository leaveRepository;
-    private final UserRepository userRepository;
 
     public PasswordResult createLeave(User user, CreateLeaveDTO request) {
         Leaves leaves = Leaves.builder()
@@ -46,6 +45,7 @@ public class LeaveService {
                 .reason(leave.getReason())
                 .user(leave.getUser())
                 .approvalStatus(ApprovalStatus.승인)
+                .inactiveReason(null)
                 .build();
         leaveRepository.save(ApproveLeave);
 
