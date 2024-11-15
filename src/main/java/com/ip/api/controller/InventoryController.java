@@ -127,35 +127,6 @@ public class InventoryController {
         return ApiResponse.of(inventoryHistoryPage);
     }
 
-//    @GetMapping("/history")
-//    public ApiResponse<InventoryPageDto<InventoryHistoryResponseDto>> getInventoryHistoryList(
-//            @RequestParam(name = "page", defaultValue = "0") int page,               
-//            @RequestParam(name = "size", defaultValue = "10") int size,              
-//            @RequestParam(name = "sortBy", defaultValue = "changeDate") String sortBy,
-//            @RequestParam(name = "direction", defaultValue = "asc") String direction,
-//            @RequestParam(name = "changeType", required = false) ChangeType changeType,
-//            @RequestParam(name = "productName", required = false) String productName) { // productName을 선택적으로 필터링
-//        
-//        InventoryPageDto<InventoryHistoryResponseDto> inventoryHistoryPage = 
-//                inventoryService.getAllInventoryHistoryList(page, size, sortBy, direction, changeType, productName);
-//        
-//        return ApiResponse.of(inventoryHistoryPage);
-//    }
-
-    
-//    @GetMapping("/history")
-//    public ApiResponse<InventoryPageDto<InventoryHistoryResponseDto>> getInventoryHistoryList(
-//            @RequestParam(name = "page", defaultValue = "0") int page,               // 기본 페이지는 0
-//            @RequestParam(name = "size", defaultValue = "10") int size,             // 기본 사이즈는 10
-//            @RequestParam(name = "sortBy", defaultValue = "changeDate") String sortBy, // 기본 정렬 기준은 chagneDate
-//            @RequestParam(name = "direction", defaultValue = "asc") String direction, // 기본 정렬 방향은 오름차순
-//            @RequestParam(name = "changeType", required = false) ChangeType changeType) { // changeType을 선택적으로 필터링
-//            
-//        InventoryPageDto<InventoryHistoryResponseDto> inventoryHistoryPage = 
-//                inventoryService.getAllInventoryHistoryList(page, size, sortBy, direction, changeType);
-//        
-//        return ApiResponse.of(inventoryHistoryPage);
-//    }
     
 
 }

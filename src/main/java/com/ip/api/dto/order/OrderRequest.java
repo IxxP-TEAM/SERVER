@@ -60,7 +60,7 @@ public class OrderRequest {
     public static class OrderProductDTO {
         private Long productId;
         private Long quantity;
-        //private BigDecimal price;
+        private BigDecimal price;
         private BigDecimal discount;
         private BigDecimal tax;
     }

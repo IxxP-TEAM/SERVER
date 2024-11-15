@@ -23,7 +23,7 @@ public enum ErrorCode {
 
     // leave
     LEAVE_NOT_FOUND(HttpStatus.NOT_FOUND, "LEAVE-001", "존재하지 않는 휴가입니다."),
-    
+
     //attendance
     CHECK_IN_ALREADY(HttpStatus.BAD_REQUEST, "ATT-001", "이미 출근처리 되었습니다."),
 

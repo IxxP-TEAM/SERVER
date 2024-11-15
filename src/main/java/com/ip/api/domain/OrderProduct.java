@@ -21,8 +21,8 @@ public class OrderProduct extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long quantity;
-    //private BigDecimal price;
-    private BigDecimal subtotal;
+    private BigDecimal price;
+    private BigDecimal total;
     private BigDecimal discount;
     private BigDecimal tax;
     @ManyToOne

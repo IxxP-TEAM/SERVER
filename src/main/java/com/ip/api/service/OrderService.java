@@ -48,31 +48,52 @@ public class OrderService {
 
         Orders savedOrder = ordersRepository.save(order);
 
-        orderDTO.getProducts().forEach(productDTO -> {
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        BigDecimal totalDiscountAmount = BigDecimal.ZERO;
+        BigDecimal totalTaxAmount = BigDecimal.ZERO;
+
+        for (OrderRequest.OrderProductDTO productDTO : orderDTO.getProducts()) {
             Product product = productRepository.findById(productDTO.getProductId())
                     .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+
+            BigDecimal originalPrice = BigDecimal.valueOf(product.getProductPrice());
+            BigDecimal quantity = BigDecimal.valueOf(productDTO.getQuantity());
+
+            // 1. 부가세 적용된 금액 계산
+            BigDecimal tax = originalPrice.multiply(quantity).multiply(BigDecimal.valueOf(0.1));
+            BigDecimal priceWithTax = originalPrice.multiply(quantity).add(tax);
+
+            // 2. 부가세 적용된 금액에 대한 할인 금액 계산 및 최종 가격 설정
+            BigDecimal discountAmount = priceWithTax.multiply(productDTO.getDiscount().divide(BigDecimal.valueOf(100)));
+            BigDecimal finalPrice = priceWithTax.subtract(discountAmount);
+
+            totalAmount = totalAmount.add(finalPrice);
+            totalDiscountAmount = totalDiscountAmount.add(discountAmount);
+            totalTaxAmount = totalTaxAmount.add(tax);
 
             OrderProduct orderProduct = OrderProduct.builder()
                     .product(product)
                     .quantity(productDTO.getQuantity())
-                   // .price(productDTO.getPrice())
-                    .discount(productDTO.getDiscount())
-                    .tax(productDTO.getTax())
-                  //  .subtotal(productDTO.getPrice().multiply(BigDecimal.valueOf(productDTO.getQuantity())))
+                    .price(originalPrice)
+                    .discount(discountAmount)
+                    .tax(tax)
+                    .total(finalPrice)
                     .order(savedOrder)
                     .build();
 
-            // OrderProduct를 명시적으로 저장
             orderProductRepository.save(orderProduct);
-
-            // Orders 객체에도 추가하여 양방향 관계 유지
             savedOrder.addOrderProduct(orderProduct);
-        });
+        }
 
-        // 전체 Orders와 연관된 OrderProducts 저장
+        order.setTotalAmount(totalAmount.intValue());
+        order.setDiscountAmount(totalDiscountAmount.intValue());
+        order.setTaxAmount(totalTaxAmount.intValue());
+
         Orders finalSavedOrder = ordersRepository.save(savedOrder);
         return new OrderResponse(finalSavedOrder);
     }
+
+
 
     // 주문 조회
     @Transactional(readOnly = true)
@@ -81,7 +102,6 @@ public class OrderService {
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
         return new OrderResponse(order);
     }
-
     // 전체 주문 조회 (페이징 적용)
     @Transactional(readOnly = true)
     public Page<OrderResponse> getAllOrders(int page, int size) {
@@ -97,36 +117,53 @@ public class OrderService {
         Orders order = ordersRepository.findByIdWithProducts(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
 
-        // 기본 주문 정보 업데이트
         order.setOrderDate(orderDTO.getOrderDate());
-        order.setDiscountAmount(orderDTO.getDiscountAmount());
-        order.setTaxAmount(orderDTO.getTaxAmount());
         order.setOrderNote(orderDTO.getOrderNote());
         order.setShippingAddr(orderDTO.getShippingAddr());
         order.setShippingSdate(orderDTO.getShippingSdate());
 
-        // 주문에 포함된 OrderProduct 리스트 업데이트
-        order.getOrderProducts().clear(); // 기존 OrderProduct 리스트 초기화
+        order.getOrderProducts().clear();
 
-        orderDTO.getProducts().forEach(productDTO -> {
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        BigDecimal totalDiscountAmount = BigDecimal.ZERO;
+        BigDecimal totalTaxAmount = BigDecimal.ZERO;
+
+        for (OrderRequest.OrderProductDTO productDTO : orderDTO.getProducts()) {
             Product product = productRepository.findById(productDTO.getProductId())
                     .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+
+            BigDecimal originalPrice = BigDecimal.valueOf(product.getProductPrice());
+            BigDecimal quantity = BigDecimal.valueOf(productDTO.getQuantity());
+
+            BigDecimal tax = originalPrice.multiply(quantity).multiply(BigDecimal.valueOf(0.1));
+            BigDecimal priceWithTax = originalPrice.multiply(quantity).add(tax);
+
+            BigDecimal discountAmount = priceWithTax.multiply(productDTO.getDiscount().divide(BigDecimal.valueOf(100)));
+            BigDecimal finalPrice = priceWithTax.subtract(discountAmount);
+
+            totalAmount = totalAmount.add(finalPrice);
+            totalDiscountAmount = totalDiscountAmount.add(discountAmount);
+            totalTaxAmount = totalTaxAmount.add(tax);
 
             OrderProduct orderProduct = OrderProduct.builder()
                     .product(product)
                     .quantity(productDTO.getQuantity())
-                   // .price(product.getPrice()) // Product의 가격을 가져와서 설정
-                    .discount(productDTO.getDiscount())
-                    .tax(productDTO.getTax())
-                  //  .subtotal(product.getPrice().multiply(BigDecimal.valueOf(productDTO.getQuantity())))
+                    .price(originalPrice)
+                    .discount(discountAmount)
+                    .tax(tax)
+                    .total(finalPrice)
                     .order(order)
                     .build();
 
-            orderProductRepository.save(orderProduct); // OrderProduct 저장
-            order.addOrderProduct(orderProduct); // Orders 객체에 OrderProduct 추가
-        });
+            orderProductRepository.save(orderProduct);
+            order.addOrderProduct(orderProduct);
+        }
 
-        Orders updatedOrder = ordersRepository.save(order); // 변경된 Orders 저장
+        order.setTotalAmount(totalAmount.intValue());
+        order.setDiscountAmount(totalDiscountAmount.intValue());
+        order.setTaxAmount(totalTaxAmount.intValue());
+
+        Orders updatedOrder = ordersRepository.save(order);
         return new OrderResponse(updatedOrder);
     }
 
