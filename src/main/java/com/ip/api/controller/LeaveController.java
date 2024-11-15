@@ -4,6 +4,7 @@ import com.ip.api.apiPayload.code.ApiResponse;
 import com.ip.api.auth.AuthUser;
 import com.ip.api.domain.User;
 import com.ip.api.dto.leave.LeaveRequest.CreateLeaveDTO;
+import com.ip.api.dto.leave.LeaveRequest.RefuseLeaveDTO;
 import com.ip.api.dto.user.UserResponse.PasswordResult;
 import com.ip.api.service.LeaveService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,14 @@ public class LeaveController {
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<PasswordResult> approve(@PathVariable long leaveId) {
         PasswordResult response = leaveService.approve(leaveId);
+        return ApiResponse.of(response);
+    }
+
+    // 휴가 거절하기
+    @PatchMapping("/refusal/{leaveId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<PasswordResult> refuse(@PathVariable long leaveId, @RequestBody RefuseLeaveDTO request) {
+        PasswordResult response = leaveService.refuse(leaveId, request);
         return ApiResponse.of(response);
     }
 }
