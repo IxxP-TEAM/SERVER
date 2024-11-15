@@ -7,9 +7,17 @@ import com.ip.api.domain.User;
 import com.ip.api.domain.enums.ApprovalStatus;
 import com.ip.api.dto.leave.LeaveRequest.CreateLeaveDTO;
 import com.ip.api.dto.leave.LeaveRequest.RefuseLeaveDTO;
+import com.ip.api.dto.leave.LeaveResponse.LeaveListDTO;
+import com.ip.api.dto.user.UserResponse.ListForPaging;
 import com.ip.api.dto.user.UserResponse.PasswordResult;
 import com.ip.api.repository.LeaveRepository;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,6 +82,34 @@ public class LeaveService {
 
         return PasswordResult.builder()
                 .userId(RefuseLeave.getUser().getUserId())
+                .build();
+    }
+
+    public ListForPaging getLeaveList(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Leaves> response = leaveRepository.findAll(pageable);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        List<LeaveListDTO> leaveListDTO = response.getContent().stream()
+                .map(leaveEntity -> {
+                    String formattedDates = leaveEntity.getStartDate().format(formatter) +
+                            " ~ " +
+                            leaveEntity.getEndDate().format(formatter);
+                    return new LeaveListDTO(
+                            leaveEntity.getLeaveId(),
+                            leaveEntity.getUser().getUserName(),
+                            leaveEntity.getLeaveType(),
+                            formattedDates,
+                            leaveEntity.getApprovalStatus()
+                    );
+                })
+                .collect(Collectors.toList());
+        return ListForPaging.builder()
+                .totalElements(response.getTotalElements())
+                .totalPages(response.getTotalPages())
+                .pageSize(response.getSize())
+                .currentPage(response.getNumber())
+                .items((List<Object>) (Object) leaveListDTO)
                 .build();
     }
 }
