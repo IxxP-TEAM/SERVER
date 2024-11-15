@@ -6,11 +6,12 @@ import com.ip.api.domain.Leaves;
 import com.ip.api.domain.User;
 import com.ip.api.domain.enums.ApprovalStatus;
 import com.ip.api.dto.leave.LeaveRequest.CreateLeaveDTO;
+import com.ip.api.dto.leave.LeaveRequest.RefuseLeaveDTO;
 import com.ip.api.dto.user.UserResponse.PasswordResult;
 import com.ip.api.repository.LeaveRepository;
-import com.ip.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +52,28 @@ public class LeaveService {
 
         return PasswordResult.builder()
                 .userId(ApproveLeave.getUser().getUserId())
+                .build();
+    }
+
+    @Transactional
+    public PasswordResult refuse(long leaveId, RefuseLeaveDTO request) {
+        Leaves leave = leaveRepository.findById(leaveId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.LEAVE_NOT_FOUND));
+
+        Leaves RefuseLeave = Leaves.builder()
+                .leaveId(leave.getLeaveId())
+                .leaveType(leave.getLeaveType())
+                .startDate(leave.getStartDate())
+                .endDate(leave.getEndDate())
+                .reason(leave.getReason())
+                .user(leave.getUser())
+                .approvalStatus(ApprovalStatus.거절)
+                .inactiveReason(request.getRefuseReason())
+                .build();
+        leaveRepository.save(RefuseLeave);
+
+        return PasswordResult.builder()
+                .userId(RefuseLeave.getUser().getUserId())
                 .build();
     }
 }

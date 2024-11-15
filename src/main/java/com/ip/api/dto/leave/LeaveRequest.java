@@ -18,4 +18,12 @@ public class LeaveRequest {
         private LocalDateTime endDate;
         private String reason;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RefuseLeaveDTO {
+        private String refuseReason;
+    }
 }
