@@ -22,6 +22,17 @@ public class SalesHistoryService {
     @Autowired
     private SalesHistoryRepository salesHistoryRepository;
 
+    // 모든 판매 내역 조회 (페이징)
+    public Page<SalesResponse.SalesPagedResponse> getAllSalesHistory(Pageable pageable) {
+        return salesHistoryRepository.findAll(pageable)
+                .map(salesHistory -> new SalesResponse.SalesPagedResponse(
+                        salesHistory.getSalesDate(),
+                        salesHistory.getSalesAmount(),
+                        salesHistory.getCustomer().getCustomerName(),
+                        salesHistory.getUser().getUserName()
+                ));
+    }
+
     // 매출 개요 (Overview)
     public SalesResponse.SalesOverviewResponse getSalesOverview() {
         BigDecimal totalSales = salesHistoryRepository.getTotalSales();
@@ -90,34 +101,33 @@ public class SalesHistoryService {
         return new SalesResponse.SalesGrowthRateResponse(growthRate);
     }
 
-    // 고객사별 총 매출 합계 조회
-    public List<SalesResponse.SalesByCustomerSummaryResponse> getTotalSalesByCustomer() {
-        List<Object[]> results = salesHistoryRepository.getTotalSalesByCustomer();
-        return results.stream()
-                .map(result -> new SalesResponse.SalesByCustomerSummaryResponse(
-                        (Long) result[0], // customerId
-                        (BigDecimal) result[1] // totalSales
-                ))
-                .collect(Collectors.toList());
+    // 고객사별 총 매출 합계 조회 (고객사 이름 포함)
+    public Page<SalesResponse.SalesByCustomerSummaryResponse> getTotalSalesByCustomer(Pageable pageable) {
+        Page<Object[]> results = salesHistoryRepository.getTotalSalesByCustomerWithName(pageable);
+        return results.map(result -> new SalesResponse.SalesByCustomerSummaryResponse(
+                (String) result[0], // customerName
+                (BigDecimal) result[1] // totalSales
+        ));
     }
 
+
     // 사원별 총 매출 합계 조회
-    public List<SalesResponse.SalesBySalespersonSummaryResponse> getTotalSalesByUser() {
-        List<Object[]> results = salesHistoryRepository.getTotalSalesByUser();
-        return results.stream()
-                .map(result -> new SalesResponse.SalesBySalespersonSummaryResponse(
-                        (Long) result[0], // userId
-                        (BigDecimal) result[1] // totalSales
-                ))
-                .collect(Collectors.toList());
+    public Page<SalesResponse.SalesBySalespersonSummaryResponse> getTotalSalesByUser(Pageable pageable) {
+        Page<Object[]> results = salesHistoryRepository.getTotalSalesByUser(pageable);
+        return results.map(result -> new SalesResponse.SalesBySalespersonSummaryResponse(
+                (String) result[0], // userName
+                (BigDecimal) result[1] // totalSales
+        ));
     }
+
+
 
     // 특정 기간 동안 고객사별 총 매출 합계 조회
     public List<SalesResponse.SalesByCustomerSummaryResponse> getTotalSalesByCustomerAndDate(LocalDate startDate, LocalDate endDate) {
         List<Object[]> results = salesHistoryRepository.getTotalSalesByCustomerAndDate(startDate, endDate);
         return results.stream()
                 .map(result -> new SalesResponse.SalesByCustomerSummaryResponse(
-                        (Long) result[0], // customerId
+                        (String) result[0], // customerId
                         (BigDecimal) result[1] // totalSales
                 ))
                 .collect(Collectors.toList());
@@ -128,7 +138,7 @@ public class SalesHistoryService {
         List<Object[]> results = salesHistoryRepository.getTotalSalesByUserAndDate(startDate, endDate);
         return results.stream()
                 .map(result -> new SalesResponse.SalesBySalespersonSummaryResponse(
-                        (Long) result[0], // userId
+                        (String) result[0], // userId
                         (BigDecimal) result[1] // totalSales
                 ))
                 .collect(Collectors.toList());
@@ -169,18 +179,14 @@ public class SalesHistoryService {
                 .collect(Collectors.toList());
     }
 
-    //매출 페이징 처리
-    public Page<SalesResponse.SalesPagedResponse> getPagedSalesData(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<SalesHistory> salesPage = salesHistoryRepository.findAllSales(pageable);
-
-        return salesPage.map(sales -> new SalesResponse.SalesPagedResponse(
-                sales.getSalesDate(),
-                sales.getSalesAmount(),
-                sales.getCustomer().getCustomerId(),
-                sales.getUser().getUserId()
-        ));
+    public List<SalesResponse.DailySalesResponse> getDailySalesStatistics(LocalDate startDate, LocalDate endDate) {
+        List<Object[]> results = salesHistoryRepository.getDailySalesStatistics(startDate, endDate);
+        return results.stream()
+                .map(result -> new SalesResponse.DailySalesResponse(
+                        (LocalDate) result[0], // 날짜
+                        (BigDecimal) result[1] // 총 매출
+                ))
+                .collect(Collectors.toList());
     }
-
 
 }
