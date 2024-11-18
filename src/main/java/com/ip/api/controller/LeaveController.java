@@ -5,6 +5,7 @@ import com.ip.api.auth.AuthUser;
 import com.ip.api.domain.User;
 import com.ip.api.dto.leave.LeaveRequest.CreateLeaveDTO;
 import com.ip.api.dto.leave.LeaveRequest.RefuseLeaveDTO;
+import com.ip.api.dto.leave.LeaveResponse.LeaveDetailDTO;
 import com.ip.api.dto.user.UserResponse.ListForPaging;
 import com.ip.api.dto.user.UserResponse.PasswordResult;
 import com.ip.api.service.LeaveService;
@@ -50,9 +51,17 @@ public class LeaveController {
     // 휴가 목록 리스트 조회
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<ListForPaging> getLeaveList(@RequestParam(defaultValue = "0")int page,
-                                                   @RequestParam(defaultValue = "10")int size) {
+    public ApiResponse<ListForPaging> getLeaveList(@RequestParam int page,
+                                                   @RequestParam int size) {
         ListForPaging response = leaveService.getLeaveList(page, size);
+        return ApiResponse.of(response);
+    }
+
+    // 휴가 상세 정보 조회
+    @GetMapping("/{leaveId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<LeaveDetailDTO> getLeaveDetail(@PathVariable long leaveId) {
+        LeaveDetailDTO response = leaveService.getLeaveDetail(leaveId);
         return ApiResponse.of(response);
     }
 }

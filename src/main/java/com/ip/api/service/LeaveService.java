@@ -7,6 +7,7 @@ import com.ip.api.domain.User;
 import com.ip.api.domain.enums.ApprovalStatus;
 import com.ip.api.dto.leave.LeaveRequest.CreateLeaveDTO;
 import com.ip.api.dto.leave.LeaveRequest.RefuseLeaveDTO;
+import com.ip.api.dto.leave.LeaveResponse.LeaveDetailDTO;
 import com.ip.api.dto.leave.LeaveResponse.LeaveListDTO;
 import com.ip.api.dto.user.UserResponse.ListForPaging;
 import com.ip.api.dto.user.UserResponse.PasswordResult;
@@ -110,6 +111,21 @@ public class LeaveService {
                 .pageSize(response.getSize())
                 .currentPage(response.getNumber())
                 .items((List<Object>) (Object) leaveListDTO)
+                .build();
+    }
+
+    public LeaveDetailDTO getLeaveDetail(long leaveId) {
+        Leaves leaves = leaveRepository.findById(leaveId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.LEAVE_NOT_FOUND));
+        return LeaveDetailDTO.builder()
+                .leaveId(leaves.getLeaveId())
+                .username(leaves.getUser().getUserName())
+                .approvalStatus(leaves.getApprovalStatus())
+                .startDate(leaves.getStartDate())
+                .endDate(leaves.getEndDate())
+                .leaveType(leaves.getLeaveType())
+                .reason(leaves.getReason())
+                .inactiveReason(leaves.getInactiveReason())
                 .build();
     }
 }
