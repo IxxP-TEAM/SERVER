@@ -9,6 +9,8 @@ import com.ip.api.domain.User;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +21,14 @@ public class SalesHistoryController {
 
     @Autowired
     private SalesHistoryService salesHistoryService;
+
+
+    // 모든 판매 내역 조회 (페이징)
+    @GetMapping("/all")
+    public ApiResponse<Page<SalesResponse.SalesPagedResponse>> getAllSalesHistory(Pageable pageable) {
+        Page<SalesResponse.SalesPagedResponse> response = salesHistoryService.getAllSalesHistory(pageable);
+        return ApiResponse.of(response);
+    }
 
     // 매출 개요 조회
     @GetMapping("/overview")
@@ -61,17 +71,24 @@ public class SalesHistoryController {
 
     // 고객사별 총 매출 합계 조회
     @GetMapping("/total-by-customer")
-    public ApiResponse<List<SalesResponse.SalesByCustomerSummaryResponse>> getTotalSalesByCustomer(@AuthUser User user) {
-        List<SalesResponse.SalesByCustomerSummaryResponse> response = salesHistoryService.getTotalSalesByCustomer();
+    public ApiResponse<Page<SalesResponse.SalesByCustomerSummaryResponse>> getTotalSalesByCustomer(
+            Pageable pageable) {
+        Page<SalesResponse.SalesByCustomerSummaryResponse> response = salesHistoryService.getTotalSalesByCustomer(pageable);
         return ApiResponse.of(response);
     }
 
+
     // 사원별 총 매출 합계 조회
     @GetMapping("/total-by-salesperson")
-    public ApiResponse<List<SalesResponse.SalesBySalespersonSummaryResponse>> getTotalSalesByUser(@AuthUser User user) {
-        List<SalesResponse.SalesBySalespersonSummaryResponse> response = salesHistoryService.getTotalSalesByUser();
+    public ApiResponse<Page<SalesResponse.SalesBySalespersonSummaryResponse>> getTotalSalesByUser(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthUser User user) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<SalesResponse.SalesBySalespersonSummaryResponse> response = salesHistoryService.getTotalSalesByUser(pageable);
         return ApiResponse.of(response);
     }
+
 
     // 특정 기간 동안 고객사별 총 매출 합계 조회
     @PostMapping("/total-by-customer/date")
@@ -118,14 +135,11 @@ public class SalesHistoryController {
         return ApiResponse.of(response);
     }
 
-    //매출 페이징 처리
-    @GetMapping("/paged-sales")
-    public ApiResponse<Page<SalesResponse.SalesPagedResponse>> getPagedSalesData(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Page<SalesResponse.SalesPagedResponse> response = salesHistoryService.getPagedSalesData(page, size);
+    @PostMapping("/daily-statistics")
+    public ApiResponse<List<SalesResponse.DailySalesResponse>> getDailySalesStatistics(
+            @Valid @RequestBody SalesRequest.DateRangeRequest request) {
+        List<SalesResponse.DailySalesResponse> response =
+                salesHistoryService.getDailySalesStatistics(request.getStartDate(), request.getEndDate());
         return ApiResponse.of(response);
     }
-
-
 }

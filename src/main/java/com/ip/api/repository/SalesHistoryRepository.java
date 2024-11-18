@@ -44,9 +44,16 @@ public interface SalesHistoryRepository extends JpaRepository<SalesHistory, Long
     @Query("SELECT sh.customer.customerId, SUM(sh.salesAmount) FROM SalesHistory sh GROUP BY sh.customer.customerId")
     List<Object[]> getTotalSalesByCustomer();
 
+    // 고객사별 총 매출 합계 (고객사 이름 포함)
+    @Query("SELECT sh.customer.customerName, SUM(sh.salesAmount) AS totalSales " +
+            "FROM SalesHistory sh " +
+            "GROUP BY sh.customer.customerName " +
+            "ORDER BY totalSales DESC")
+    Page<Object[]> getTotalSalesByCustomerWithName(Pageable pageable);
+
     // 사원별 총 매출 합계
-    @Query("SELECT sh.user.userId, SUM(sh.salesAmount) FROM SalesHistory sh GROUP BY sh.user.userId")
-    List<Object[]> getTotalSalesByUser();
+    @Query("SELECT sh.user.userName, SUM(sh.salesAmount) FROM SalesHistory sh GROUP BY sh.user.userName")
+    Page<Object[]> getTotalSalesByUser(Pageable pageable);
 
     // 특정 기간 동안 고객사별 총 매출 합계
     @Query("SELECT sh.customer.customerId, SUM(sh.salesAmount) FROM SalesHistory sh " +
@@ -83,6 +90,13 @@ public interface SalesHistoryRepository extends JpaRepository<SalesHistory, Long
     //매출 데이터 페이징
     @Query("SELECT sh FROM SalesHistory sh ORDER BY sh.salesDate DESC")
     Page<SalesHistory> findAllSales(Pageable pageable);
+
+    @Query("SELECT sh.salesDate, SUM(sh.salesAmount) " +
+            "FROM SalesHistory sh " +
+            "WHERE sh.salesDate BETWEEN :startDate AND :endDate " +
+            "GROUP BY sh.salesDate " +
+            "ORDER BY sh.salesDate")
+    List<Object[]> getDailySalesStatistics(LocalDate startDate, LocalDate endDate);
 
 
 }

@@ -2,6 +2,7 @@ package com.ip.api.dto.sales;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -74,14 +75,14 @@ public class SalesResponse {
     @Data
     @AllArgsConstructor
     public static class SalesByCustomerSummaryResponse {
-        private Long customerId;
+        private String customerId;
         private BigDecimal totalSales;
     }
 
     @Data
     @AllArgsConstructor
     public static class SalesBySalespersonSummaryResponse {
-        private Long userId;
+        private String  userName;
         private BigDecimal totalSales;
     }
     @Data
@@ -110,8 +111,15 @@ public class SalesResponse {
     public static class SalesPagedResponse  {
         private LocalDate salesDate;
         private BigDecimal salesAmount;
-        private Long customerId;
-        private Long userId;
+        private String customerId;
+        private String userId;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class DailySalesResponse {
+        private LocalDate salesDate;
+        private BigDecimal totalSales;
     }
 
 
