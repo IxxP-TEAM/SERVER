@@ -55,14 +55,20 @@ public interface SalesHistoryRepository extends JpaRepository<SalesHistory, Long
     @Query("SELECT sh.user.userName, SUM(sh.salesAmount) FROM SalesHistory sh GROUP BY sh.user.userName")
     Page<Object[]> getTotalSalesByUser(Pageable pageable);
 
-    // 특정 기간 동안 고객사별 총 매출 합계
-    @Query("SELECT sh.customer.customerId, SUM(sh.salesAmount) FROM SalesHistory sh " +
-            "WHERE sh.salesDate BETWEEN :startDate AND :endDate GROUP BY sh.customer.customerId")
+    // 특정 기간 동안 고객사별 총 매출 합계 조회 (고객사 이름 포함)
+    @Query("SELECT sh.customer.customerName, SUM(sh.salesAmount) " +
+            "FROM SalesHistory sh " +
+            "WHERE sh.salesDate BETWEEN :startDate AND :endDate " +
+            "GROUP BY sh.customer.customerName " +
+            "ORDER BY SUM(sh.salesAmount) DESC")
     List<Object[]> getTotalSalesByCustomerAndDate(LocalDate startDate, LocalDate endDate);
 
-    // 특정 기간 동안 사원별 총 매출 합계
-    @Query("SELECT sh.user.userId, SUM(sh.salesAmount) FROM SalesHistory sh " +
-            "WHERE sh.salesDate BETWEEN :startDate AND :endDate GROUP BY sh.user.userId")
+    // 특정 기간 동안 사원별 총 매출 합계 조회 (사원 이름 포함)
+    @Query("SELECT sh.user.userName, SUM(sh.salesAmount) " +
+            "FROM SalesHistory sh " +
+            "WHERE sh.salesDate BETWEEN :startDate AND :endDate " +
+            "GROUP BY sh.user.userName " +
+            "ORDER BY SUM(sh.salesAmount) DESC")
     List<Object[]> getTotalSalesByUserAndDate(LocalDate startDate, LocalDate endDate);
 
     //월별 매출 통계
@@ -73,18 +79,18 @@ public interface SalesHistoryRepository extends JpaRepository<SalesHistory, Long
             "ORDER BY month")
     List<Object[]> getMonthlySalesStatistics(LocalDate startDate, LocalDate endDate);
 
-    //고객사의 상위 매출 기여도
-    @Query("SELECT sh.customer.customerId, SUM(sh.salesAmount) AS totalSales " +
+    // 상위 고객사의 매출 (고객사 이름 포함)
+    @Query("SELECT sh.customer.customerName, SUM(sh.salesAmount) " +
             "FROM SalesHistory sh " +
-            "GROUP BY sh.customer.customerId " +
-            "ORDER BY totalSales DESC")
+            "GROUP BY sh.customer.customerName " +
+            "ORDER BY SUM(sh.salesAmount) DESC")
     List<Object[]> getTopCustomersBySales();
 
-    //사원의 상위 매출 기여도
-    @Query("SELECT sh.user.userId, SUM(sh.salesAmount) AS totalSales " +
+    // 상위 사원의 매출 (사원 이름 포함)
+    @Query("SELECT sh.user.userName, SUM(sh.salesAmount) " +
             "FROM SalesHistory sh " +
-            "GROUP BY sh.user.userId " +
-            "ORDER BY totalSales DESC")
+            "GROUP BY sh.user.userName " +
+            "ORDER BY SUM(sh.salesAmount) DESC")
     List<Object[]> getTopSalespersonsBySales();
 
     //매출 데이터 페이징

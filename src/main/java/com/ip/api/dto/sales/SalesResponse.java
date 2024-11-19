@@ -95,14 +95,14 @@ public class SalesResponse {
     @Data
     @AllArgsConstructor
     public static class TopCustomerResponse {
-        private Long customerId;
+        private String customerId;
         private BigDecimal totalSales;
     }
 
     @Data
     @AllArgsConstructor
     public static class TopSalespersonResponse {
-        private Long userId;
+        private String userId;
         private BigDecimal totalSales;
     }
 
