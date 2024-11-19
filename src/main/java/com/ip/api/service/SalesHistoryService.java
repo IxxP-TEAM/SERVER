@@ -127,18 +127,19 @@ public class SalesHistoryService {
         List<Object[]> results = salesHistoryRepository.getTotalSalesByCustomerAndDate(startDate, endDate);
         return results.stream()
                 .map(result -> new SalesResponse.SalesByCustomerSummaryResponse(
-                        (String) result[0], // customerId
+                        (String) result[0], // customerName
                         (BigDecimal) result[1] // totalSales
                 ))
                 .collect(Collectors.toList());
     }
+
 
     // 특정 기간 동안 사원별 총 매출 합계 조회
     public List<SalesResponse.SalesBySalespersonSummaryResponse> getTotalSalesByUserAndDate(LocalDate startDate, LocalDate endDate) {
         List<Object[]> results = salesHistoryRepository.getTotalSalesByUserAndDate(startDate, endDate);
         return results.stream()
                 .map(result -> new SalesResponse.SalesBySalespersonSummaryResponse(
-                        (String) result[0], // userId
+                        (String) result[0], // userName
                         (BigDecimal) result[1] // totalSales
                 ))
                 .collect(Collectors.toList());
@@ -155,25 +156,26 @@ public class SalesHistoryService {
                 .collect(Collectors.toList());
     }
 
-    //고객사의 상위 매출 기여도
+    // 상위 고객사의 매출 조회
     public List<SalesResponse.TopCustomerResponse> getTopCustomersBySales(int limit) {
         List<Object[]> results = salesHistoryRepository.getTopCustomersBySales();
         return results.stream()
                 .limit(limit)
                 .map(result -> new SalesResponse.TopCustomerResponse(
-                        (Long) result[0], // customerId
+                        (String) result[0], // customerName
                         (BigDecimal) result[1] // totalSales
                 ))
                 .collect(Collectors.toList());
     }
 
-    //사원의 상위 매출 기여도
+
+    // 상위 사원의 매출 조회
     public List<SalesResponse.TopSalespersonResponse> getTopSalespersonsBySales(int limit) {
         List<Object[]> results = salesHistoryRepository.getTopSalespersonsBySales();
         return results.stream()
                 .limit(limit)
                 .map(result -> new SalesResponse.TopSalespersonResponse(
-                        (Long) result[0], // userId
+                        (String) result[0], // userName
                         (BigDecimal) result[1] // totalSales
                 ))
                 .collect(Collectors.toList());
