@@ -36,13 +36,14 @@ public class UserService {
 
             CustomUserDetails customUserDetails = (CustomUserDetails) auth.getPrincipal();
             String username = customUserDetails.getUsername();
+            long userId = customUserDetails.getUserId();
 
             Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
             Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
             GrantedAuthority authority = iterator.next();
             String role = authority.getAuthority();
 
-            return jwtUtil.generateToken(username, role);
+            return jwtUtil.generateToken(userId, username, role);
         } catch (BadCredentialsException e) {
             throw new BadRequestException(ErrorCode.USER_BAD_CREDENTIAL);  // 잘못된 자격 증명
         } catch (AuthenticationException e) {

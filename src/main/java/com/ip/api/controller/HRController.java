@@ -57,7 +57,6 @@ public class HRController {
 
     // 직원 상세 정보 조회
     @GetMapping("/{userId}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<UserDTO> getUserInfo(@AuthUser User user, @PathVariable long userId) {
         UserDTO response = hrService.getUserInfo(userId);
         return ApiResponse.of(response);

@@ -7,6 +7,7 @@ import com.ip.api.domain.User;
 import com.ip.api.domain.enums.ApprovalStatus;
 import com.ip.api.dto.leave.LeaveRequest.CreateLeaveDTO;
 import com.ip.api.dto.leave.LeaveRequest.RefuseLeaveDTO;
+import com.ip.api.dto.leave.LeaveResponse.LeaveDetailDTO;
 import com.ip.api.dto.leave.LeaveResponse.LeaveListDTO;
 import com.ip.api.dto.user.UserResponse.ListForPaging;
 import com.ip.api.dto.user.UserResponse.PasswordResult;
@@ -88,6 +89,49 @@ public class LeaveService {
     public ListForPaging getLeaveList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Leaves> response = leaveRepository.findAll(pageable);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        List<LeaveListDTO> leaveListDTO = response.getContent().stream()
+                .map(leaveEntity -> {
+                    String formattedDates = leaveEntity.getStartDate().format(formatter) +
+                            " ~ " +
+                            leaveEntity.getEndDate().format(formatter);
+                    return new LeaveListDTO(
+                            leaveEntity.getLeaveId(),
+                            leaveEntity.getUser().getUserName(),
+                            leaveEntity.getLeaveType(),
+                            formattedDates,
+                            leaveEntity.getApprovalStatus()
+                    );
+                })
+                .collect(Collectors.toList());
+        return ListForPaging.builder()
+                .totalElements(response.getTotalElements())
+                .totalPages(response.getTotalPages())
+                .pageSize(response.getSize())
+                .currentPage(response.getNumber())
+                .items((List<Object>) (Object) leaveListDTO)
+                .build();
+    }
+
+    public LeaveDetailDTO getLeaveDetail(long leaveId) {
+        Leaves leaves = leaveRepository.findById(leaveId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.LEAVE_NOT_FOUND));
+        return LeaveDetailDTO.builder()
+                .leaveId(leaves.getLeaveId())
+                .username(leaves.getUser().getUserName())
+                .approvalStatus(leaves.getApprovalStatus())
+                .startDate(leaves.getStartDate())
+                .endDate(leaves.getEndDate())
+                .leaveType(leaves.getLeaveType())
+                .reason(leaves.getReason())
+                .inactiveReason(leaves.getInactiveReason())
+                .build();
+    }
+
+    public ListForPaging getMyLeaveList(int page, int size, User user) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Leaves> response = leaveRepository.findByUser(pageable, user);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         List<LeaveListDTO> leaveListDTO = response.getContent().stream()

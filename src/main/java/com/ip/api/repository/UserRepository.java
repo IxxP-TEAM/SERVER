@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByConnId(String connId);
+    Optional<User> findByUserName(String username);
     boolean existsByEmail(String email);
     Page<User> findAll(Pageable pageable);
     User findByEmail(String email);
