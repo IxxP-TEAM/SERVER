@@ -67,6 +67,14 @@ public class UserResponse {
         private AttendanceStatus status;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AttendanceDTO {
+        private boolean status;
+    }
+
 
     @Builder
     @Getter
@@ -82,5 +90,6 @@ public class UserResponse {
         private String checkOut; // 퇴근시간
         private String workTime; //근무시간
         private boolean lateFlag;   //지각여부
+        private boolean earlyLeaveFlag;     //결근여부
     }
 }

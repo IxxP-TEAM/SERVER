@@ -3,6 +3,7 @@ package com.ip.api.controller;
 import com.ip.api.apiPayload.code.ApiResponse;
 import com.ip.api.auth.AuthUser;
 import com.ip.api.domain.User;
+import com.ip.api.dto.user.UserResponse.AttendanceDTO;
 import com.ip.api.dto.user.UserResponse.AttendanceStatusDTO;
 import com.ip.api.dto.user.UserResponse.ListForPaging;
 import com.ip.api.service.AttendanceService;
@@ -21,13 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AttendanceController {
     private final AttendanceService attendanceService;
     @GetMapping("/status")
-    public ApiResponse<AttendanceStatusDTO> checkInStatus(@AuthUser User user) {
-        AttendanceStatusDTO response = attendanceService.checkInStatus(user);
+    public ApiResponse<AttendanceDTO> checkInStatus(@AuthUser User user) {
+        AttendanceDTO response = attendanceService.checkInStatus(user);
         return ApiResponse.of(response);
     }
 
     // 출근하기
-    @PostMapping("")
+    @PostMapping
     public ApiResponse<AttendanceStatusDTO> checkIn(@AuthUser User user) {
         AttendanceStatusDTO response = attendanceService.checkIn(user);
         return ApiResponse.of(response);
@@ -42,7 +43,6 @@ public class AttendanceController {
 
     // 개인별 출퇴근 현황 조회
     @GetMapping("/{userId}/monthly")
-    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<ListForPaging> monthlyAttendanceStatus(@AuthUser User user,
                                                               @PathVariable Long userId,
                                                               @RequestParam(defaultValue = "0") int page,

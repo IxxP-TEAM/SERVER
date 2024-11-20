@@ -29,10 +29,11 @@ public class JwtUtil {
         this.customUserDetailsService = customUserDetailsService;
     }
 
-    public JwtTokenDto generateToken(String username, String role) {
+    public JwtTokenDto generateToken(long userId, String username, String role) {
 
         //access 토큰 생성
         String accessToken = Jwts.builder()
+                .claim("userId", userId)
                 .claim("username", username)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
