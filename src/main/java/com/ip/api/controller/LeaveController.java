@@ -59,9 +59,16 @@ public class LeaveController {
 
     // 휴가 상세 정보 조회
     @GetMapping("/{leaveId}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<LeaveDetailDTO> getLeaveDetail(@PathVariable long leaveId) {
         LeaveDetailDTO response = leaveService.getLeaveDetail(leaveId);
+        return ApiResponse.of(response);
+    }
+
+    // 내가 신청한 휴가 목록 리스트
+    @GetMapping("/myLeave")
+    public ApiResponse<ListForPaging> getMyLeave(@RequestParam int page,
+                                                 @RequestParam int size, @AuthUser User user) {
+        ListForPaging response = leaveService.getMyLeaveList(page, size, user);
         return ApiResponse.of(response);
     }
 }

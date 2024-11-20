@@ -128,4 +128,32 @@ public class LeaveService {
                 .inactiveReason(leaves.getInactiveReason())
                 .build();
     }
+
+    public ListForPaging getMyLeaveList(int page, int size, User user) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Leaves> response = leaveRepository.findByUser(pageable, user);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        List<LeaveListDTO> leaveListDTO = response.getContent().stream()
+                .map(leaveEntity -> {
+                    String formattedDates = leaveEntity.getStartDate().format(formatter) +
+                            " ~ " +
+                            leaveEntity.getEndDate().format(formatter);
+                    return new LeaveListDTO(
+                            leaveEntity.getLeaveId(),
+                            leaveEntity.getUser().getUserName(),
+                            leaveEntity.getLeaveType(),
+                            formattedDates,
+                            leaveEntity.getApprovalStatus()
+                    );
+                })
+                .collect(Collectors.toList());
+        return ListForPaging.builder()
+                .totalElements(response.getTotalElements())
+                .totalPages(response.getTotalPages())
+                .pageSize(response.getSize())
+                .currentPage(response.getNumber())
+                .items((List<Object>) (Object) leaveListDTO)
+                .build();
+    }
 }
