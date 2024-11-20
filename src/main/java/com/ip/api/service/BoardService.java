@@ -64,12 +64,13 @@ public class BoardService {
         }
     }
 
-
     @Transactional
-    public void incrementViewCount(Long boardId) {
+    public BoardResponse incrementViewCount(Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-        board.incrementViewCount();
+        board.incrementViewCount(); // 조회수 증가
+        boardRepository.save(board); // 변경 사항 저장
+        return BoardResponse.fromEntity(board); // BoardResponse로 변환하여 반환
     }
 
     @Transactional(readOnly = true)
@@ -132,6 +133,12 @@ public class BoardService {
         boardRepository.delete(board);
 
         return response;
+    }
+    @Transactional(readOnly = true)
+    public BoardResponse getBoardDetail(Long id) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
+        return BoardResponse.fromEntity(board);
     }
 
 }

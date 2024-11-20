@@ -80,4 +80,17 @@ public class BoardController {
         return ApiResponse.of(response);
     }
 
+    @GetMapping("/{id}")
+    public ApiResponse<BoardResponse> getBoardDetail(@PathVariable Long id) {
+        BoardResponse response = boardService.getBoardDetail(id);
+        return ApiResponse.of(response);
+    }
+
+    //조회수 증가
+    @PostMapping("/{id}/view")
+    public ApiResponse<BoardResponse> incrementViewCount(@PathVariable Long id) {
+        BoardResponse response = boardService.incrementViewCount(id);
+        return ApiResponse.of(response); // 증가된 조회수를 포함한 BoardResponse 반환
+    }
+
 }

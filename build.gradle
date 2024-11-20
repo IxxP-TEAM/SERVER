@@ -50,6 +50,9 @@ dependencies {
 
 	//redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// AWS S3 SDK
+	implementation 'software.amazon.awssdk:s3:2.20.66'
 }
 
 tasks.named('test') {
