@@ -24,7 +24,7 @@ public class SalesHistoryService {
 
     // 모든 판매 내역 조회 (페이징)
     public Page<SalesResponse.SalesPagedResponse> getAllSalesHistory(Pageable pageable) {
-        return salesHistoryRepository.findAll(pageable)
+        return salesHistoryRepository.findAllSales(pageable)
                 .map(salesHistory -> new SalesResponse.SalesPagedResponse(
                         salesHistory.getSalesDate(),
                         salesHistory.getSalesAmount(),

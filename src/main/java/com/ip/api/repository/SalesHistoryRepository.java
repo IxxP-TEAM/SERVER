@@ -15,10 +15,6 @@ import java.util.Optional;
 @Repository
 public interface SalesHistoryRepository extends JpaRepository<SalesHistory, Long> {
 
-    // 전체 매출 데이터 조회
-    @Query("SELECT sh FROM SalesHistory sh ORDER BY sh.salesDate DESC")
-    List<SalesHistory> findAllSales();
-
     // 특정 주문 ID로 SalesHistory 조회
     Optional<SalesHistory> findByOrderOrderId(Long orderId);
 
@@ -94,7 +90,7 @@ public interface SalesHistoryRepository extends JpaRepository<SalesHistory, Long
     List<Object[]> getTopSalespersonsBySales();
 
     //매출 데이터 페이징
-    @Query("SELECT sh FROM SalesHistory sh ORDER BY sh.salesDate DESC")
+    @Query("SELECT sh FROM SalesHistory sh ORDER BY sh.salesDate DESC, sh.id ASC")
     Page<SalesHistory> findAllSales(Pageable pageable);
 
     @Query("SELECT sh.salesDate, SUM(sh.salesAmount) " +
