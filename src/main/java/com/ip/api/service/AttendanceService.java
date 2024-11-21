@@ -1,7 +1,6 @@
 package com.ip.api.service;
 
 import com.ip.api.apiPayload.code.ErrorCode;
-import com.ip.api.apiPayload.exception.BadRequestException;
 import com.ip.api.apiPayload.exception.BusinessBaseException;
 import com.ip.api.apiPayload.exception.NotFoundException;
 import com.ip.api.domain.Attendence;
@@ -129,7 +128,9 @@ public class AttendanceService {
                     LocalDateTime checkInTime = attendence.getCheckInTime();
                     LocalDateTime checkOutTime = attendence.getCheckOutTime();
 
-                    String workTime = getFormattedWorkTime(checkInTime, checkOutTime);
+                    String workTime = (checkInTime != null && checkOutTime != null)
+                            ? getFormattedWorkTime(checkInTime, checkOutTime)
+                            : null;
 
                     return new MonthlyAttendanceStatusDTO(
                             attendence.getUser().getUserId(),
@@ -137,10 +138,11 @@ public class AttendanceService {
                             attendence.getUser().getJobTitle(),
                             attendence.getUser().getDepartment(),
                             formatDate(attendence.getCreatedAt()),
-                            formatTime(checkInTime),
-                            formatTime(checkOutTime),
+                            checkInTime != null ? formatTime(checkInTime) : null, // checkInTime이 null일 경우 null 반환
+                            checkOutTime != null ? formatTime(checkOutTime) : null,
                             workTime,
-                            attendence.isLateFlag()
+                            attendence.isLateFlag(),
+                            attendence.isEarlyLeaveFlag()
                     );
                 })
                 .collect(Collectors.toList());

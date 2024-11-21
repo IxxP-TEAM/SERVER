@@ -43,7 +43,6 @@ public class AttendanceController {
 
     // 개인별 출퇴근 현황 조회
     @GetMapping("/{userId}/monthly")
-    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<ListForPaging> monthlyAttendanceStatus(@AuthUser User user,
                                                               @PathVariable Long userId,
                                                               @RequestParam(defaultValue = "0") int page,

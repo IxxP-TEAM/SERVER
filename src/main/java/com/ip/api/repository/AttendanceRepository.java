@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AttendanceRepository extends JpaRepository<Attendence, Long> {
-    Attendence findByUser(User user);
     Page<Attendence> findByUser(User user, Pageable pageable);
     Optional<Attendence> findByUserAndCheckInTimeBetween(User user, LocalDateTime startOfDay, LocalDateTime endOfDay);
     Attendence findByUserAndAttStatusAndCheckInTimeBetween(User user, AttendanceStatus attStatus, LocalDateTime checkInTime, LocalDateTime checkOutTime);
