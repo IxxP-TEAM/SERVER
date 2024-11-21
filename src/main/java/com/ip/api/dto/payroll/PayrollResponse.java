@@ -1,6 +1,8 @@
 package com.ip.api.dto.payroll;
 
 import com.ip.api.domain.enums.Department;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +18,7 @@ public class PayrollResponse {
         private String connId;
         private String username;
         private Department department;
+        private LocalDateTime month;
         private String jobTitle;
         private String baseSalary;//기본급
         private String overtimePay;//야간근로수당

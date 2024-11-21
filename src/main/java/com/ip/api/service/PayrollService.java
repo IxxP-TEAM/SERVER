@@ -80,15 +80,18 @@ public class PayrollService {
                 }
 
                 // 출근 시간과 퇴근 시간의 차이를 계산
-                LocalDateTime checkInDateTime = LocalDateTime.of(attendence.getCheckInTime().toLocalDate(), checkInTime);
-                LocalDateTime checkOutDateTime = LocalDateTime.of(attendence.getCheckOutTime().toLocalDate(), standardCheckOutTime);
+                LocalDateTime checkInDateTime = LocalDateTime.of(attendence.getCheckInTime().toLocalDate(),
+                        checkInTime);
+                LocalDateTime checkOutDateTime = LocalDateTime.of(attendence.getCheckOutTime().toLocalDate(),
+                        standardCheckOutTime);
 
                 // 총 근무 시간 계산
                 totalWorkMinutes += Duration.between(checkInDateTime, checkOutDateTime).toMinutes();
 
                 // 야근 시간 계산 (18시 이후의 시간만 추가)
                 if (attendence.getCheckOutTime().toLocalTime().isAfter(standardCheckOutTime)) {
-                    totalNightWorkMinutes += Duration.between(standardCheckOutTime, attendence.getCheckOutTime().toLocalTime()).toMinutes();
+                    totalNightWorkMinutes += Duration.between(standardCheckOutTime,
+                            attendence.getCheckOutTime().toLocalTime()).toMinutes();
                 }
             }
         }
@@ -146,6 +149,7 @@ public class PayrollService {
                 .build();
 
     }
+
     // 기본급, 4대보험, 소득세, 주민세 계산
     private double calculateSalary(double baseSalary) {
         // 4대보험 계산 (고정 비율 예시)
@@ -223,7 +227,7 @@ public class PayrollService {
 
     // 급여 전체 조회
     public ListForPaging getPayList(int page, int size) {
-        Pageable pageable = PageRequest.of(page,size);
+        Pageable pageable = PageRequest.of(page, size);
         Page<Payroll> response = payrollRepository.findAll(pageable);
 
         NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
@@ -251,7 +255,6 @@ public class PayrollService {
                         .build())
                 .collect(Collectors.toList());
 
-
         return ListForPaging.builder()
                 .items(Collections.singletonList(payrollDTO))
                 .totalPages(response.getTotalPages())
@@ -259,7 +262,43 @@ public class PayrollService {
                 .currentPage(page)
                 .pageSize(size)
                 .build();
+    }
 
+    public ListForPaging getPayInfo(User user, int page, int size, YearMonth start, YearMonth end) {
+        LocalDateTime startDateTime = start.atDay(1).atStartOfDay();
+        LocalDateTime endDateTime = end.atEndOfMonth().atTime(23, 59, 59);
 
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Payroll> response = payrollRepository.findByUserAndCreatedAtBetween(user, startDateTime, endDateTime,
+                pageable);
+
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+        numberFormat.setMaximumFractionDigits(0); // 소수점 자리수 제거
+        numberFormat.setGroupingUsed(true);
+
+        List<PersonalPayrollDTO> payrollDTO = response.getContent().stream()
+                .map(payroll -> PersonalPayrollDTO.builder()
+                        .payId(payroll.getPayId())
+                        .month(payroll.getCreatedAt())
+                        .baseSalary(numberFormat.format(payroll.getBaseSalary())) // 문자열 반환
+                        .overtimePay(numberFormat.format((int) (payroll.getOvertimeHours() * 200)))
+                        .bonus(numberFormat.format(payroll.getBonus()))
+                        .incomeTax(numberFormat.format((int) payroll.getIncomeTax()))
+                        .localIncomeTax(numberFormat.format((int) payroll.getLocalTax()))
+                        .nationalPension(numberFormat.format((int) payroll.getNationPension()))
+                        .healthInsurance(numberFormat.format((int) payroll.getHealthInsurance()))
+                        .employmentInsurance(numberFormat.format((int) payroll.getEmploymentInsurance()))
+                        .totalAmount(numberFormat.format((int) payroll.getTotalAmount()))
+                        .absentDeduction(numberFormat.format((int) payroll.getAbsentDeduction()))
+                        .paymentStatus(payroll.isPaymentStatus())
+                        .build())
+                .collect(Collectors.toList());
+        return ListForPaging.builder()
+                .items(Collections.singletonList(payrollDTO))
+                .totalPages(response.getTotalPages())
+                .totalElements(response.getTotalElements())
+                .currentPage(page)
+                .pageSize(size)
+                .build();
     }
 }

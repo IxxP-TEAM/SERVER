@@ -3,6 +3,7 @@ package com.ip.api.repository;
 import com.ip.api.domain.Payroll;
 import com.ip.api.domain.User;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +20,6 @@ public interface PayrollRepository extends JpaRepository<Payroll, Long> {
     @Transactional
     @Query("UPDATE Payroll p SET p.paymentStatus = true WHERE p.paymentDate <= :today AND p.paymentStatus = false")
     void updatePaymentStatusForPastPayroll(LocalDate today);
+
+    Page<Payroll> findByUserAndCreatedAtBetween(User user, LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable);
 }
