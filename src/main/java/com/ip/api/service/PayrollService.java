@@ -75,6 +75,10 @@ public class PayrollService {
                     checkInTime = standardCheckInTime;
                 }
 
+                if (checkInTime.isAfter(standardCheckInTime)) {
+                    totalLateMinutes += Duration.between(standardCheckInTime, checkInTime).toMinutes();
+                }
+
                 // 출근 시간과 퇴근 시간의 차이를 계산
                 LocalDateTime checkInDateTime = LocalDateTime.of(attendence.getCheckInTime().toLocalDate(), checkInTime);
                 LocalDateTime checkOutDateTime = LocalDateTime.of(attendence.getCheckOutTime().toLocalDate(), standardCheckOutTime);
@@ -90,23 +94,23 @@ public class PayrollService {
         }
         // 5. 기본급 계산 (시간당 10,000원 기준)
         double hourlyRate = 10000; // 시간당 급여
-        double calculatedBaseSalary = (totalWorkMinutes / 60.0) * hourlyRate;
+        double calculatedBaseSalary = Math.floor((totalWorkMinutes / 60.0) * hourlyRate);
 
         // 6. 공제 및 추가 항목 계산
         double lateDeductionRate = 100; // 지각/조퇴 시 분당 차감 금액
         double nightAllowanceRate = 200; // 야근 시 분당 추가 금액
 
         // 지각/조퇴 차감
-        double deduction = (totalLateMinutes + totalEarlyLeaveMinutes) * lateDeductionRate;
+        double deduction = Math.floor((totalLateMinutes + totalEarlyLeaveMinutes) * lateDeductionRate);
 
         // 야근 수당 추가
-        double nightAllowance = totalNightWorkMinutes * nightAllowanceRate;
+        double nightAllowance = Math.floor(totalNightWorkMinutes * nightAllowanceRate);
 
         // 4대보험과 세금 계산
         Map<String, Double> insuranceDetails = calculateInsurance(calculatedBaseSalary);
 
         // 최종 급여 계산
-        double finalSalary = calculateSalary(calculatedBaseSalary + nightAllowance - deduction) + request.getBonus();
+        double finalSalary = Math.floor(calculatedBaseSalary + nightAllowance - deduction) + request.getBonus();
 
         // 급여 등록 (기타 항목 설정)
         Payroll payroll = Payroll.builder()
@@ -124,6 +128,7 @@ public class PayrollService {
                 .industrialAccidentInsurance(insuranceDetails.get("industrialAccidentInsurance"))
                 .incomeTax(insuranceDetails.get("incomeTax"))
                 .localTax(insuranceDetails.get("localTax"))
+                .absentDeduction((int) deduction)
                 .build();
         payrollRepository.save(payroll);
 
@@ -241,7 +246,7 @@ public class PayrollService {
                         .healthInsurance(numberFormat.format((int) payroll.getHealthInsurance()))
                         .employmentInsurance(numberFormat.format((int) payroll.getEmploymentInsurance()))
                         .totalAmount(numberFormat.format((int) payroll.getTotalAmount()))
-                        .absentDeduction(numberFormat.format((int) payroll.getAbsentDeduction() * 100))
+                        .absentDeduction(numberFormat.format((int) payroll.getAbsentDeduction()))
                         .paymentStatus(payroll.isPaymentStatus())
                         .build())
                 .collect(Collectors.toList());
