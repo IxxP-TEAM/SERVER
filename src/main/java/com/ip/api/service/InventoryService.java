@@ -19,6 +19,7 @@ import com.ip.api.domain.InventoryHistory;
 import com.ip.api.domain.Product;
 import com.ip.api.domain.User;
 import com.ip.api.domain.enums.ChangeType;
+import com.ip.api.domain.enums.ProductType;
 import com.ip.api.dto.inventory.InventoryHistoryRequestDto;
 import com.ip.api.dto.inventory.InventoryHistoryResponseDto;
 import com.ip.api.dto.inventory.InventoryListDto;
@@ -146,6 +147,10 @@ public class InventoryService {
 	    Product product = productRepository.findByProductName(inventoryHistoryRequestDto.getProductName())
 	            .orElseThrow(() -> new BadRequestException(ErrorCode.PRODUCT_NOT_FOUND));
 
+		if(ProductType.완제품.equals(product.getProductType())) {
+			throw new BadRequestException(ErrorCode.PRODUCT_NOT_MATERIAL);
+		}
+	    
 	    int remainingQuantity = inventoryHistoryRequestDto.getQuantity();
 
 	    // 전체 재고 수량 계산
@@ -318,56 +323,7 @@ public class InventoryService {
 	    return InventoryPageDto.from(responseDtoPage, sortBy, direction);
 	}
 
-//	public InventoryPageDto<InventoryHistoryResponseDto> getAllInventoryHistoryList(int page, int size, String sortBy, String direction, ChangeType changeType, String productName) {
-//	    // 유효한 정렬 필드만 허용
-//	    if (!sortBy.equals("productName") && !sortBy.equals("changeDate") && !sortBy.equals("changeType")) {
-//	        throw new BadRequestException(ErrorCode.INVALID_INPUT_VALUE);
-//	    }
-//
-//	    // 정렬 방향 설정
-//	    Sort.Direction sortDirection = direction.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-//	    Sort sort = Sort.by(sortDirection, sortBy.equals("productName") ? "product.productName" : sortBy);
-//
-//	    Pageable pageable = PageRequest.of(page, size, sort);
-//
-//	    Page<InventoryHistory> historyPage;
-//	    if (productName != null && !productName.isEmpty()) {
-//	        // productName으로 검색
-//	        historyPage = (changeType != null) 
-//	                ? inventoryHistoryRepository.findByProduct_ProductNameContainingAndChangeType(productName, changeType, pageable)
-//	                : inventoryHistoryRepository.findByProduct_ProductNameContaining(productName, pageable);
-//	    } else {
-//	        // productName 없이 조회
-//	        historyPage = (changeType != null) 
-//	                ? inventoryHistoryRepository.findByChangeType(changeType, pageable)
-//	                : inventoryHistoryRepository.findAll(pageable);
-//	    }
-//
-//	    Page<InventoryHistoryResponseDto> responseDtoPage = historyPage.map(InventoryHistoryResponseDto::fromEntity);
-//	    return InventoryPageDto.from(responseDtoPage, sortBy, direction);
-//	}
 
-	
-//	public InventoryPageDto<InventoryHistoryResponseDto> getAllInventoryHistoryList(int page, int size, String sortBy, String direction, ChangeType changeType) {
-//	    // 유효한 정렬 필드만 허용
-//	    if (!sortBy.equals("productName") && !sortBy.equals("changeDate") && !sortBy.equals("changeType")) {
-//	        throw new BadRequestException(ErrorCode.INVALID_INPUT_VALUE);
-//	    }
-//
-//	    // 정렬 방향 설정
-//	    Sort.Direction sortDirection = direction.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-//	    Sort sort = Sort.by(sortDirection, sortBy.equals("productName") ? "product.productName" : sortBy);
-//
-//	    Pageable pageable = PageRequest.of(page, size, sort);
-//
-//	    Page<InventoryHistory> historyPage = (changeType != null) 
-//	            ? inventoryHistoryRepository.findByChangeType(changeType, pageable)
-//	            : inventoryHistoryRepository.findAll(pageable);
-//
-//	    Page<InventoryHistoryResponseDto> responseDtoPage = historyPage.map(InventoryHistoryResponseDto::fromEntity);
-//
-//	    return InventoryPageDto.from(responseDtoPage, sortBy, direction);
-//	}
 
 
 	

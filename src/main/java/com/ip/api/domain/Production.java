@@ -3,6 +3,7 @@ package com.ip.api.domain;
 import com.ip.api.domain.common.BaseEntity;
 import com.ip.api.domain.enums.ProductionStatus;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,7 +11,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+
 import java.time.LocalDate;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,4 +45,11 @@ public class Production extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "userId")
     private User user;
+    
+    
+    // 생산 결과 입력 
+    public void updateResult(int resultQuantity) {
+        this.resultQuantity = resultQuantity;
+        this.productionStatus = ProductionStatus.완료;
+    }
 }

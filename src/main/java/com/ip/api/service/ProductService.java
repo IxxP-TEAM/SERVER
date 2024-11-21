@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
 
 import com.ip.api.apiPayload.code.ErrorCode;
 import com.ip.api.apiPayload.exception.BadRequestException;
-import com.ip.api.apiPayload.exception.NotFoundException;
 import com.ip.api.domain.Product;
 import com.ip.api.dto.product.PageDto;
 import com.ip.api.dto.product.ProductRequestDto;
 import com.ip.api.dto.product.ProductResponseDto;
+import com.ip.api.repository.InventoryHistoryRepository;
 import com.ip.api.repository.InventoryRepository;
 import com.ip.api.repository.ProductRepository;
 
@@ -22,6 +22,7 @@ public class ProductService {
 	
 	private final ProductRepository productRepository;
 	private final InventoryRepository inventoryRepository;
+	private final InventoryHistoryRepository inventoryHistoryRepository;
 	
 	// 제품 등록
 	public ProductResponseDto createProduct(ProductRequestDto productRequestDto) {
@@ -67,11 +68,11 @@ public class ProductService {
 	// 제품 삭제
 	public PageDto deleteProduct(Long id, Pageable pageable) {
 		
+		
 		// 재고에 제품이 존재하는지 확인
         if (inventoryRepository.existsByProductProductId(id)) {
             throw new BadRequestException(ErrorCode.PRODUCT_EXISTS_IN_INVENTORY); 
         }
-		
 	    productRepository.deleteById(id);
 	    Page<Product> productPage = productRepository.findAll(pageable);
 	    return PageDto.from(productPage); 
@@ -87,10 +88,9 @@ public class ProductService {
 	
 	// 제품 목록 조회
     public PageDto getAllProducts(Pageable pageable) {
-        // Repository에서 Pageable을 사용해 페이징 및 정렬된 데이터를 조회
+    	
         Page<Product> productPage = productRepository.findAll(pageable);
 
-        // Page 객체를 PageDto로 변환
         return PageDto.from(productPage);
     }
 }

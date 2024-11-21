@@ -32,12 +32,21 @@ public enum ErrorCode {
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "PRODUCT-002", "해당 제품을 찾을 수 없습니다."),
     PRODUCTUSER_NOT_FOUND(HttpStatus.NOT_FOUND, "PRODUCT-003", "해당 사용자를 찾을 수 없습니다."),
     PRODUCT_EXISTS_IN_INVENTORY(HttpStatus.NOT_FOUND, "PRODUCT-004", "재고에 이미 존재하는 제품입니다."),
+    PRODUCT_NOT_FINISHED(HttpStatus.NOT_FOUND, "PRODUCT-005", "완제품이 아닙니다"),
+    PRODUCT_NOT_MATERIAL(HttpStatus.NOT_FOUND, "PRODUCT-006", "원재료가 아닙니다"),
     
     //inventory
     INVENTORY_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "INVENTORY-001", "수량은 양수이어야 합니다."),
     OUTBOUND_QUANTITY_EXCEEDS_STOCK(HttpStatus.BAD_REQUEST,"INVENTORY-002","출고 수량이 재고 수량보다 많습니다."),
     INVENTORY_NOT_FOUND(HttpStatus.NOT_FOUND,"INVENTORY-003", "해당 유통기한을 찾을 수 없습니다."),
-    INVENTORY_ADJUSTMENT_REASON_REQUIRED(HttpStatus.BAD_REQUEST,"INVENTORY", "조정 사유를 입력하세요")
+    INVENTORY_ADJUSTMENT_REASON_REQUIRED(HttpStatus.BAD_REQUEST,"INVENTORY", "조정 사유를 입력하세요"),
+    
+    //production
+    PRODUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "PRODUCTION_001", " 해당 생산 계획을 찾을 수 없습니다."),
+    PRODUCTION_NOT_STATUS(HttpStatus.BAD_REQUEST, "PRODUCTION_002", "생산 상태가 '완료' 상태 입니다."),
+    PRODUCTION_NOT_STATUS_FINISHED(HttpStatus.BAD_REQUEST, "PRODUCTION_003", "생산 상태가 '진행중' 상태 입니다."),
+    PRODUCTION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "PRODUCTION_004", "이미 생산 분석이 등록되어 있습니다."),
+    PRODUCTION_NOT_ANALYSIS(HttpStatus.NOT_FOUND, "PRODUCTION_005", "생산 분석을 찾을 수 없습니다.")
     ;
 
 
