@@ -11,6 +11,7 @@ import com.ip.api.repository.AttendanceRepository;
 import com.ip.api.repository.PayrollRepository;
 import com.ip.api.repository.UserRepository;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -196,5 +198,12 @@ public class PayrollService {
         insuranceDetails.put("totalInsurance", totalInsurance);
 
         return insuranceDetails;
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void updatePayrollStatus() {
+        LocalDate today = LocalDate.now();
+        payrollRepository.updatePaymentStatusForPastPayroll(today);
+
     }
 }
