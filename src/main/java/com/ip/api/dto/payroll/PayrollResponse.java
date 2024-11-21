@@ -1,5 +1,6 @@
 package com.ip.api.dto.payroll;
 
+import com.ip.api.domain.enums.Department;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,24 +15,22 @@ public class PayrollResponse {
         private long payId;
         private String connId;
         private String username;
-        private int baseSalary;
-        private int overtimePay;
-        private int bonus;
-        // 소득세
-        private int incomeTax;
-        // 지방소득세
-        private int localIncomeTax;
-        // 국민연금
-        private int nationalPension;
-        //건강보험
-        private int healthInsurance;
-        //고용보험
-        private int employmentInsurance;
-        //총공제액
-        private int totalDeductions;
+        private Department department;
+        private String jobTitle;
+        private String baseSalary;//기본급
+        private String overtimePay;//야간근로수당
+        private String bonus;//보너스
+        // 소득세111
+        private String incomeTax;// 소득세
+        private String localIncomeTax;// 지방소득세(주민세)
+        private String nationalPension;//국민연금
+        private String healthInsurance;//건강보험
+        private String employmentInsurance;//고용보험
+//        private int totalDeductions;
 
         // 지급 총액
-        private int totalAmount;
+        private String totalAmount;
+        private String absentDeduction;//결근/조퇴으로 차감된
         private boolean paymentStatus;
     }
     @Builder

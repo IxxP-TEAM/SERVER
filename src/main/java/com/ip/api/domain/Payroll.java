@@ -24,6 +24,7 @@ public class Payroll extends BaseEntity {
     private Long payId;
     private double baseSalary;
     private double overtimeHours;  //추가근무시
+    private int absentDeduction;//  조퇴및결근
     private int bonus;
     private String deductions;
     private double totalAmount;

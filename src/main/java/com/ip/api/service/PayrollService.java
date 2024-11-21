@@ -7,18 +7,27 @@ import com.ip.api.domain.Payroll;
 import com.ip.api.domain.User;
 import com.ip.api.dto.payroll.PayrollRequest.CreatePayrollDTO;
 import com.ip.api.dto.payroll.PayrollResponse.PayrollIdDTO;
+import com.ip.api.dto.payroll.PayrollResponse.PersonalPayrollDTO;
+import com.ip.api.dto.user.UserResponse.ListForPaging;
 import com.ip.api.repository.AttendanceRepository;
 import com.ip.api.repository.PayrollRepository;
 import com.ip.api.repository.UserRepository;
+import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -204,6 +213,48 @@ public class PayrollService {
     public void updatePayrollStatus() {
         LocalDate today = LocalDate.now();
         payrollRepository.updatePaymentStatusForPastPayroll(today);
+
+    }
+
+    // 급여 전체 조회
+    public ListForPaging getPayList(int page, int size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<Payroll> response = payrollRepository.findAll(pageable);
+
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+        numberFormat.setMaximumFractionDigits(0); // 소수점 자리수 제거
+        numberFormat.setGroupingUsed(true);
+
+        List<PersonalPayrollDTO> payrollDTO = response.getContent().stream()
+                .map(payroll -> PersonalPayrollDTO.builder()
+                        .payId(payroll.getPayId())
+                        .connId(payroll.getUser().getUserName())
+                        .username(payroll.getUser().getUserName())
+                        .department(payroll.getUser().getDepartment())
+                        .jobTitle(payroll.getUser().getJobTitle())
+                        .baseSalary(numberFormat.format(payroll.getBaseSalary())) // 문자열 반환
+                        .overtimePay(numberFormat.format((int) (payroll.getOvertimeHours() * 200)))
+                        .bonus(numberFormat.format(payroll.getBonus()))
+                        .incomeTax(numberFormat.format((int) payroll.getIncomeTax()))
+                        .localIncomeTax(numberFormat.format((int) payroll.getLocalTax()))
+                        .nationalPension(numberFormat.format((int) payroll.getNationPension()))
+                        .healthInsurance(numberFormat.format((int) payroll.getHealthInsurance()))
+                        .employmentInsurance(numberFormat.format((int) payroll.getEmploymentInsurance()))
+                        .totalAmount(numberFormat.format((int) payroll.getTotalAmount()))
+                        .absentDeduction(numberFormat.format((int) payroll.getAbsentDeduction() * 100))
+                        .paymentStatus(payroll.isPaymentStatus())
+                        .build())
+                .collect(Collectors.toList());
+
+
+        return ListForPaging.builder()
+                .items(Collections.singletonList(payrollDTO))
+                .totalPages(response.getTotalPages())
+                .totalElements(response.getTotalElements())
+                .currentPage(page)
+                .pageSize(size)
+                .build();
+
 
     }
 }

@@ -5,6 +5,7 @@ import com.ip.api.auth.AuthUser;
 import com.ip.api.domain.User;
 import com.ip.api.dto.payroll.PayrollRequest.CreatePayrollDTO;
 import com.ip.api.dto.payroll.PayrollResponse.PayrollIdDTO;
+import com.ip.api.dto.payroll.PayrollResponse.PersonalPayrollDTO;
 import com.ip.api.dto.user.UserResponse.ListForPaging;
 import com.ip.api.service.PayrollService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,14 @@ public class PayrollController {
     @PostMapping("")
     public ApiResponse<PayrollIdDTO> createPayroll(@RequestBody CreatePayrollDTO request) {
         PayrollIdDTO response = payrollService.createPayroll(request);
+        return ApiResponse.of(response);
+    }
+
+    // 급여 전체 조회 - 관리자
+    @GetMapping("/all")
+    public ApiResponse<ListForPaging> getPayList(@RequestParam(defaultValue = "0") int page,
+                                                      @RequestParam(defaultValue = "10") int size) {
+        ListForPaging response = payrollService.getPayList(page, size);
         return ApiResponse.of(response);
     }
 }
