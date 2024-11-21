@@ -1,8 +1,5 @@
 package com.ip.api.dto.payroll;
 
-import com.ip.api.domain.User;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,10 +30,23 @@ public class PayrollResponse {
         //총공제액
         private int totalDeductions;
 
-//        private float taxRate;
-//        private String deductions;
         // 지급 총액
         private int totalAmount;
         private boolean paymentStatus;
+    }
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PayrollIdDTO {
+        private long payId;
+        private long totalLateMinutes;
+        private long totalEarlyLeaveMinutes;
+        private long totalWorkMinutes;
+        private long totalNightWorkMinutes;
+        private double baseSalary;
+        private double deduction;
+        private double nightAllowance;
+        private double finalSalary;
     }
 }
