@@ -30,16 +30,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 		       "ORDER BY p.productName ASC")
 		List<InventoryListDto> findAllGroupedByProduct();
 
-	
-//	@Query("SELECT new com.ip.api.dto.inventory.InventoryListDto(p.productName, p.productType, total.totalQuantity, p.safetyStockQuantity) " +
-//		       "FROM Product p " +
-//		       "JOIN (SELECT i.product.productId AS productId, SUM(i.currentQuantity) AS totalQuantity " +
-//		       "      FROM Inventory i " +
-//		       "      GROUP BY i.product.productId) AS total ON p.productId = total.productId " +
-//		       "ORDER BY p.productName ASC")
-//	List<InventoryListDto> findAllGroupedByProduct();
-	
-	
 	// 재고 목록 상세보기
 	@Query("SELECT i FROM Inventory i WHERE i.product.productId = :productId ORDER BY i.expirationDate ASC")
     List<Inventory> getInventoryByProductId(@Param("productId") Long productId);
@@ -51,15 +41,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 		       "GROUP BY i.product.productId) AS total ON p.productId = total.productId " +
 		       "WHERE LOWER(p.productName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
 		List<InventoryListDto> findAllGroupedByProductWithSearch(@Param("searchTerm") String searchTerm);
-
-	
-//	@Query("SELECT new com.ip.api.dto.inventory.InventoryListDto(p.productName, p.productType, total.totalQuantity, p.safetyStockQuantity) " +
-//		       "FROM Product p " +
-//		       "JOIN (SELECT i.product.productId AS productId, SUM(i.currentQuantity) AS totalQuantity " +
-//		       "      FROM Inventory i " +
-//		       "      GROUP BY i.product.productId) AS total ON p.productId = total.productId " +
-//		       "WHERE LOWER(p.productName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
-//	List<InventoryListDto> findAllGroupedByProductWithSearch(@Param("searchTerm") String searchTerm);
 
 
 	boolean existsByProductProductId(Long productId);

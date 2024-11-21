@@ -56,7 +56,7 @@ public class ProductController {
 	public ApiResponse<PageDto> searchProducts(@RequestParam("productName") String productName,
 											   @RequestParam(name = "page", defaultValue = "0") int page,       // 기본 페이지 0
 											   @RequestParam(name = "size", defaultValue = "10") int size,      // 기본 사이즈 10
-											   @RequestParam(name = "sortBy", defaultValue = "productId") String sortBy,
+											   @RequestParam(name = "sortBy", defaultValue = "productName") String sortBy,
 											   @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 		
 	    Sort.Direction sortDirection = direction.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
@@ -70,7 +70,7 @@ public class ProductController {
 	@GetMapping
 	public ApiResponse<PageDto> getAllProducts(@RequestParam(name = "page", defaultValue = "0") int page,             // 기본 페이지 0
             								   @RequestParam(name = "size", defaultValue = "10") int size,            // 기본 사이즈 10
-											   @RequestParam(name = "sortBy", defaultValue = "productId") String sortBy,
+											   @RequestParam(name = "sortBy", defaultValue = "productName") String sortBy,
 											   @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 		
 		Sort.Direction sortDirection = direction.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;

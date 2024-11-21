@@ -24,7 +24,6 @@ public class InventoryHistoryResponseDto {
 	    private LocalDate expirationDate;  
 	    private LocalDate changeDate; 
 	    private String adjustment;  
-//	    private Long userId;  
 	    private String userName;
 	    
 	    public static InventoryHistoryResponseDto fromEntity(InventoryHistory inventoryHistory) {
@@ -37,7 +36,6 @@ public class InventoryHistoryResponseDto {
 	            .expirationDate(inventoryHistory.getExpirationDate())
 	            .changeDate(inventoryHistory.getChangeDate())
 	            .adjustment(inventoryHistory.getAdjustment())
-//	            .userId(inventoryHistory.getUser().getUserId())
 	            .userName(inventoryHistory.getUser().getUserName())
 	            .build();
 	    }

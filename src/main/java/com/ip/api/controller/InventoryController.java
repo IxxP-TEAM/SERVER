@@ -33,7 +33,6 @@ import lombok.RequiredArgsConstructor;
 public class InventoryController {
 	
 	private final InventoryService inventoryService;
-//	private final ProductRepository productRepository;
     private final UserRepository userRepository;
 
     // 입고 등록
@@ -93,15 +92,14 @@ public class InventoryController {
     // 재고 리스트 조회
     @GetMapping
     public ApiResponse<InventoryPageDto<InventoryListDto>> getInventoryList(
-    		@RequestParam(name = "page", defaultValue = "0") int page,             // 기본 페이지 0
-			   @RequestParam(name = "size", defaultValue = "10") int size,            // 기본 사이즈 10
+    		@RequestParam(name = "page", defaultValue = "0") int page,             
+			   @RequestParam(name = "size", defaultValue = "10") int size,            
 			   @RequestParam(name = "sortBy", defaultValue = "productName") String sortBy,
 			   @RequestParam(name = "direction", defaultValue = "asc") String direction,
 			   @RequestParam(name = "searchTerm", required = false) String searchTerm) {
 
         InventoryPageDto<InventoryListDto> inventoryPage = inventoryService.getAllInventoryList(page, size, sortBy, direction, searchTerm);
         
-        // ApiResponse로 감싸서 반환
         return ApiResponse.of(inventoryPage);
     }
     
@@ -119,7 +117,7 @@ public class InventoryController {
             @RequestParam(name = "size", defaultValue = "10") int size,              
             @RequestParam(name = "sortBy", defaultValue = "changeDate") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction,
-            @RequestParam(name = "searchQuery", required = false) String searchQuery) { // 통합 검색어 추가
+            @RequestParam(name = "searchQuery", required = false) String searchQuery) { 
 
         InventoryPageDto<InventoryHistoryResponseDto> inventoryHistoryPage = 
                 inventoryService.getAllInventoryHistoryList(page, size, sortBy, direction, searchQuery);
