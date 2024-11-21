@@ -44,8 +44,6 @@ public class ProductionService {
 	private final ProductionMaterialRepository productionMaterialRepository;
 	private final ProductionAnalysisRepository productionAnalysisRepository;
 	
-	// 생산 관리
-	
 	// 생산 계획(원재료 포함) 등록
 	@Transactional
 	public ProductionResponseDto createProduction(ProductionRequestDto productionRequestDto, User user) {
