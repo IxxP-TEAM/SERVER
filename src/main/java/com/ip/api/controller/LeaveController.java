@@ -32,6 +32,13 @@ public class LeaveController {
         return ApiResponse.of(response);
     }
 
+    @PatchMapping("/info/{leaveId}")
+    public ApiResponse<PasswordResult> updateLeave(@PathVariable long leaveId,
+                                                   @RequestBody CreateLeaveDTO request){
+        PasswordResult response = leaveService.updateLeave(request, leaveId);
+        return ApiResponse.of(response);
+    }
+
     // 휴가 승인하기
     @PatchMapping("/approval/{leaveId}")
     @PreAuthorize("hasRole('ADMIN')")

@@ -25,7 +25,7 @@ public class PayrollController {
     private final PayrollService payrollService;
 
     // 급여 등록 - 관리자
-    @PostMapping("")
+    @PostMapping
     public ApiResponse<PayrollIdDTO> createPayroll(@RequestBody CreatePayrollDTO request) {
         PayrollIdDTO response = payrollService.createPayroll(request);
         return ApiResponse.of(response);
