@@ -252,6 +252,7 @@ public class PayrollService {
                         .totalAmount(numberFormat.format((int) payroll.getTotalAmount()))
                         .absentDeduction(numberFormat.format((int) payroll.getAbsentDeduction()))
                         .paymentStatus(payroll.isPaymentStatus())
+                        .paymentDate(payroll.getPaymentDate())
                         .build())
                 .collect(Collectors.toList());
 
@@ -291,6 +292,7 @@ public class PayrollService {
                         .totalAmount(numberFormat.format((int) payroll.getTotalAmount()))
                         .absentDeduction(numberFormat.format((int) payroll.getAbsentDeduction()))
                         .paymentStatus(payroll.isPaymentStatus())
+                        .paymentDate(payroll.getPaymentDate())
                         .build())
                 .collect(Collectors.toList());
         return ListForPaging.builder()
@@ -299,6 +301,38 @@ public class PayrollService {
                 .totalElements(response.getTotalElements())
                 .currentPage(page)
                 .pageSize(size)
+                .build();
+    }
+
+    public PersonalPayrollDTO getPayDetailInfo(long payId) {
+        // 급여 정보 조회
+        Payroll payroll = payrollRepository.findById(payId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND));
+
+        // 숫자 포맷팅 설정
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+        numberFormat.setMaximumFractionDigits(0); // 소수점 자리수 제거
+        numberFormat.setGroupingUsed(true);
+
+        // 급여 DTO 변환
+        return PersonalPayrollDTO.builder()
+                .payId(payroll.getPayId())
+                .connId(payroll.getUser().getUserName())
+                .username(payroll.getUser().getUserName())
+                .department(payroll.getUser().getDepartment())
+                .jobTitle(payroll.getUser().getJobTitle())
+                .baseSalary(numberFormat.format(payroll.getBaseSalary())) // 기본 급여 포맷
+                .overtimePay(numberFormat.format((int) (payroll.getOvertimeHours() * 200))) // 초과 근무 수당 (가정: 시간당 200)
+                .bonus(numberFormat.format(payroll.getBonus())) // 보너스
+                .incomeTax(numberFormat.format((int) payroll.getIncomeTax())) // 소득세
+                .localIncomeTax(numberFormat.format((int) payroll.getLocalTax())) // 지방소득세
+                .nationalPension(numberFormat.format((int) payroll.getNationPension())) // 국민연금
+                .healthInsurance(numberFormat.format((int) payroll.getHealthInsurance())) // 건강보험
+                .employmentInsurance(numberFormat.format((int) payroll.getEmploymentInsurance())) // 고용보험
+                .totalAmount(numberFormat.format((int) payroll.getTotalAmount())) // 총 급여
+                .absentDeduction(numberFormat.format((int) payroll.getAbsentDeduction())) // 결석 공제
+                .paymentStatus(payroll.isPaymentStatus()) // 지급 상태
+                .paymentDate(payroll.getPaymentDate())
                 .build();
     }
 }

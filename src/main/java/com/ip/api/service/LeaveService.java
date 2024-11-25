@@ -156,4 +156,26 @@ public class LeaveService {
                 .items((List<Object>) (Object) leaveListDTO)
                 .build();
     }
+
+    @Transactional
+    public PasswordResult updateLeave(CreateLeaveDTO request,long leaveId) {
+        Leaves leave = leaveRepository.findById(leaveId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.LEAVE_NOT_FOUND));
+
+        Leaves updateLeave = Leaves.builder()
+                .leaveId(leave.getLeaveId())
+                .leaveType(request.getLeaveType())
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .reason(request.getReason())
+                .user(leave.getUser())
+                .approvalStatus(leave.getApprovalStatus())
+                .inactiveReason(leave.getInactiveReason())
+                .build();
+        leaveRepository.save(updateLeave);
+
+        return PasswordResult.builder()
+                .userId(updateLeave.getUser().getUserId())
+                .build();
+    }
 }

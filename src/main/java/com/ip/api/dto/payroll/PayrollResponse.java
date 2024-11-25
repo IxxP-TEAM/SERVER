@@ -1,6 +1,7 @@
 package com.ip.api.dto.payroll;
 
 import com.ip.api.domain.enums.Department;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import lombok.AllArgsConstructor;
@@ -29,12 +30,12 @@ public class PayrollResponse {
         private String nationalPension;//국민연금
         private String healthInsurance;//건강보험
         private String employmentInsurance;//고용보험
-//        private int totalDeductions;
-
         // 지급 총액
         private String totalAmount;
         private String absentDeduction;//결근/조퇴으로 차감된
         private boolean paymentStatus;
+        private LocalDate paymentDate;
+
     }
     @Builder
     @Getter

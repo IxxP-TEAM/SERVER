@@ -11,6 +11,7 @@ import com.ip.api.service.PayrollService;
 import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +25,7 @@ public class PayrollController {
     private final PayrollService payrollService;
 
     // 급여 등록 - 관리자
-    @PostMapping("")
+    @PostMapping
     public ApiResponse<PayrollIdDTO> createPayroll(@RequestBody CreatePayrollDTO request) {
         PayrollIdDTO response = payrollService.createPayroll(request);
         return ApiResponse.of(response);
@@ -49,6 +50,13 @@ public class PayrollController {
         YearMonth start = YearMonth.parse(startYearMonth);
         YearMonth end = YearMonth.parse(endYearMonth);
         ListForPaging response = payrollService.getPayInfo(user, page, size, start, end);
+        return ApiResponse.of(response);
+    }
+
+    // 급여 상세 내역 조회
+    @GetMapping("/{payId}")
+    public ApiResponse<PersonalPayrollDTO> getPayDetailInfo(@PathVariable long payId) {
+        PersonalPayrollDTO response = payrollService.getPayDetailInfo(payId);
         return ApiResponse.of(response);
     }
 }
